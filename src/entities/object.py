@@ -10,13 +10,13 @@ class Object:
     @property
     def name(self):
         return self.__name
-    @property.setter
+    @name.setter
     def name(self, name):
         self.__name = name
     
     @property
     def quantity(self):
         return self.__quantity
-    @property.setter
+    @quantity.setter
     def quantity(self, quantity):
         self.__quantity = quantity

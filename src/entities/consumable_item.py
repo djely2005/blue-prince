@@ -10,6 +10,6 @@ class ConsumableItem(Object):
     @property
     def type(self):
         return self.__type
-    @property.setter
+    @type.setter
     def type(self, type):
         self.__type = type

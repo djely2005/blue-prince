@@ -12,6 +12,6 @@ class Event(Object):
     @property
     def field(self):
         return self.__field
-    @property.setter
+    @field.setter
     def field(self, field):
         self.__field = field
