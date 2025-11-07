@@ -5,11 +5,11 @@ from src.entities.object import Object
 class ConsumableItem(Object):
     def __init__(self, name: str, quantity: int, type: ConsumableType):
         super().__init__(name, quantity)
-        self._type = type
+        self.__type = type
 
     @property
     def type(self):
-        return self.type
+        return self.__type
     @property.setter
     def type(self, type):
-        self.type = type
+        self.__type = type
