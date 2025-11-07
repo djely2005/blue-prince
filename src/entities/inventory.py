@@ -1,5 +1,8 @@
 from dataclasses import dataclass
 
+
+# Should we reconsider the implementation of inventory ?
+# I think we need a better structure
 @dataclass
 class Inventory:
     """Explicit names preferred. Counts start as per spec; adjust if design changes."""
@@ -9,6 +12,7 @@ class Inventory:
     keys: int = 0
     dice: int = 0
 
+    # This is too much tho
     # Permanent tools toggles:
     has_shovel: bool = False
     has_hammer: bool = False
@@ -16,6 +20,7 @@ class Inventory:
     has_metal_detector: bool = False # better loot chances
     has_bunny_paw: bool = False      # luck: more/better items
 
+    # Let's keep the method for later
     # We use clear verbs and explicit intent.
     def spend_steps(self, n: int) -> None:
         """Lose n steps. If steps reach 0, game over logic is handled by the scene/game loop."""
