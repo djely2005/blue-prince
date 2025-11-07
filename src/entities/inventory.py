@@ -1,8 +1,5 @@
 # src/entities/inventory.py
 from __future__ import annotations
-from typing import List, Optional
-
-# These two imports match Adam’s existing hierarchy (see his screenshots).
 from src.entities.object import Object
 from src.entities.consumable_item import ConsumableItem
 from src.entities.permanent_item import PermanentItem
@@ -10,24 +7,16 @@ from src.utils.consumable_type import ConsumableType
 
 
 class Inventory:
-    """
-    Central place to track the player's resources and items.
-
-    Design goals:
-    - Keep simple, explicit counters for the core resources the game logic uses often
-      (steps, gold, gems, keys, dice) so Map/Player/UI don’t need to scan the item list.
-    - Still keep an item list (List[Object]) because Adam’s hierarchy expects it
-      (ConsumableItem / PermanentItem / etc.). We update both worlds consistently.
-    - Provide clear, intention-revealing methods (try_spend_key, add_steps, grant_lock_pick…),
-      so gameplay code never mutates raw fields directly.
-    """
 
     def __init__(self) -> None:
         # --- Core resources (fast access) ---
         # Movement points. Decrease by 1 on every valid move (Z/Q/S/D).
+
+        
         self._steps: int = 70
 
         # Currencies & counters
+
         self._gold: int = 0
         self._gems: int = 2
         self._keys: int = 0
@@ -43,9 +32,9 @@ class Inventory:
         # --- Item collection aligned with Adam’s class tree ---
         self._objects: List[Object] = []
 
-    # -------------------------------------------------------------------------
+    
     # Read-only getters (keeps usage explicit and consistent)
-    # -------------------------------------------------------------------------
+    
     @property
     def steps(self) -> int:
         return self._steps
@@ -91,9 +80,9 @@ class Inventory:
         # Return the list so UI can show it; gameplay should prefer the methods below.
         return self._objects
 
-    # -------------------------------------------------------------------------
+    
     # Mutators for movement points (used by Player/Level when moving or eating)
-    # -------------------------------------------------------------------------
+ 
     def spend_steps(self, amount: int) -> None:
         """Lose movement points (cannot go below 0). Called after a successful move."""
         self._steps = max(0, self._steps - max(0, amount))
@@ -103,9 +92,10 @@ class Inventory:
         if amount > 0:
             self._steps += amount
 
-    # -------------------------------------------------------------------------
+    
     # Gem / Key / Dice / Gold helpers (used by Map, Events, and Items)
-    # -------------------------------------------------------------------------
+    
+
     def try_spend_gems(self, amount: int) -> bool:
         """Pay gem cost (e.g., choosing a room). Returns True on success."""
         if amount <= self._gems:
@@ -152,9 +142,10 @@ class Inventory:
             return True
         return False
 
-    # -------------------------------------------------------------------------
-    # Permanent items (toggle abilities). Mouhamed’s items call these.
-    # -------------------------------------------------------------------------
+    
+    # Permanent items (toggle abilities). 
+    
+
     def grant_shovel(self) -> None:
         self._has_shovel = True
 
@@ -170,9 +161,9 @@ class Inventory:
     def grant_bunny_paw(self) -> None:
         self._has_bunny_paw = True
 
-    # -------------------------------------------------------------------------
+    
     # Item list management (keeps Adam’s tree happy + lets UI render an inventory)
-    # -------------------------------------------------------------------------
+    
     def _find_object_by_name(self, name: str) -> Optional[Object]:
         for obj in self._objects:
             # We assume Object exposes a public attribute or property 'name'.
@@ -216,9 +207,9 @@ class Inventory:
             self._objects.remove(target)
         return True
 
-    # -------------------------------------------------------------------------
+   -
     # Applying item effects (called by Event/Room/Item logic)
-    # -------------------------------------------------------------------------
+
     def apply_consumable(self, item: ConsumableItem) -> None:
         """
         Apply the effect of a consumable item once. Caller decides if the stack should be decremented.
@@ -227,7 +218,7 @@ class Inventory:
         ctype = getattr(item, "_type", None)
         qty = getattr(item, "quantity", 1)
 
-        # IMPORTANT: Adam used attribute name "_type" in his snippet. We read it, but we never set it here.
+        
         if ctype == ConsumableType.step:
             self.add_steps(qty)
         elif ctype == ConsumableType.money:
@@ -244,7 +235,7 @@ class Inventory:
 
     def _apply_permanent_item_side_effect(self, item: PermanentItem) -> None:
         """
-        Toggle flags for specific permanent items. We compare by class name so Adam can
+        Toggle flags for specific permanent items. We compare by class name so we can
         keep separate files (hammer.py, shovel.py, lock_pick.py, metal_detector.py, bunny_paw.py).
         """
         class_name = item.__class__.__name__.lower()
@@ -260,9 +251,10 @@ class Inventory:
             self.grant_bunny_paw()
         # else: other permanent items could be added later
 
-    # -------------------------------------------------------------------------
+ # -------------------------------------------------------------------------
     # Convenience predicates used by Map/Rooms
-    # -------------------------------------------------------------------------
+ # -------------------------------------------------------------------------
+
     def can_open_level1_without_key(self) -> bool:
         """True if lock pick is owned (open level-1 doors for free)."""
         return self._has_lock_pick
