@@ -1,7 +1,6 @@
 from enum import Enum
 
-@Enum
-class ConsumableType:
+class ConsumableType(Enum):
     STEP = 1
     MONEY = 2
     GEM = 3
