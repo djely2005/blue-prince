@@ -6,3 +6,10 @@ class ConsumableItem(Object):
     def __init__(self, name: str, quantity: int, type: ConsumableType):
         super().__init__(name, quantity)
         self._type = type
+
+    @property
+    def type(self):
+        return self.type
+    @property.setter
+    def type(self, type):
+        self.type = type

@@ -8,3 +8,10 @@ class Event(Object):
         super().__init__(name, quantity)
         # I don't remember what does this do
         self._field = field
+
+    @property
+    def field(self):
+        return self._field
+    @property.setter
+    def field(self, field):
+        self._field = field

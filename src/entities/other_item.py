@@ -8,3 +8,10 @@ class OtherItem(Object):
         self._type = type
         # Check later with pygame
         self._sprite = ""
+
+    @property
+    def type(self):
+        return self.type
+    @property.setter
+    def type(self, type):
+        self.type = type
