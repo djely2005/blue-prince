@@ -46,7 +46,12 @@ class Room(ABC):
 
     @abstractmethod
     def apply_effect(self, player):
-        """Applies the room's special effect to the player."""
+        """Applies the room's special effect when the player enters."""
+        pass
+
+    @abstractmethod
+    def draft_effect(self, player):
+        """Applies the room's special effect when the player drafts."""
         pass
 
     def __repr__(self):
