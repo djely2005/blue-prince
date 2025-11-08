@@ -19,3 +19,5 @@ class Door :
     @direction.setter
     def direction(self, direction):
         self.__direction = direction
+
+    
