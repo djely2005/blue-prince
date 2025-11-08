@@ -4,5 +4,19 @@ from abc import ABC
 @ABC
 class Object:
     def __init__(self, name: str, quantity: int):
-        self._name = name
-        self._quantity = quantity
+        self.__name = name
+        self.__quantity = quantity
+    
+    @property
+    def name(self):
+        return self.__name
+    @name.setter
+    def name(self, name):
+        self.__name = name
+    
+    @property
+    def quantity(self):
+        return self.__quantity
+    @quantity.setter
+    def quantity(self, quantity):
+        self.__quantity = quantity

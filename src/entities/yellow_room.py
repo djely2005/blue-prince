@@ -11,3 +11,5 @@ class YellowRoom(Room):
             pass 
         elif self.name == "LaundryRoom":
             pass
+    
+    # I need to open the shop I think we need to pause the game for that

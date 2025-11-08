@@ -1,6 +1,7 @@
 from src.entities.room import Room
 from door import Door
 from src.entities.object import Object
+from src.entities.inventory import Inventory
 
 class RedRoom(Room):
     def __init__(self, name: str, price: int, doors: list[Door], interactables: list[Object]=[]):
@@ -10,4 +11,4 @@ class RedRoom(Room):
         if self.name == "Lavatory" :
             pass 
         elif self.name == "Gymnasium":
-            pass
+            Inventory.lose_steps(2)
