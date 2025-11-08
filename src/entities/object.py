@@ -1,8 +1,7 @@
 from abc import ABC
 
 
-@ABC
-class Object:
+class Object(ABC):
     def __init__(self, name: str, quantity: int):
         self.__name = name
         self.__quantity = quantity
