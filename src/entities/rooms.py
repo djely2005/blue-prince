@@ -1,4 +1,3 @@
-# On importe les "plans" (vos classes)
 from src.entities.blue_room import BlueRoom
 from src.entities.yellow_room import YellowRoom
 from src.entities.violet_room import VioletRoom
