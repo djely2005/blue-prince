@@ -21,5 +21,5 @@ class RoomPicker :
     @refresh_price.setter
     def refresh_price(self, refresh_price):
         self.__refresh_price = refresh_price
-    
+
     
