@@ -76,7 +76,7 @@ class Inventory:
             self.keys = player_gems
         if choice == "FliffFold":
             self.gold = player_key
-            self.key = player_gold
+            self.keys = player_gold
 
 
 
