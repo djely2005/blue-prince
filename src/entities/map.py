@@ -73,6 +73,6 @@ class Map:
                 break
         
         if not door_to_target:
-            return False # Pas de porte dans cette direction (mur)
+            return False 
 
         return door_to_target.open_door(player)
