@@ -24,22 +24,30 @@ class RoomPicker :
     def refresh_price(self, refresh_price):
         self.__refresh_price = refresh_price
 
-    def drop_rate(self, room: Room, player: Inventory):
-        drop_rate0 = room.rarity.value
+    def weight(self, room: Room, player: Inventory):
+        weight0 = room.rarity.value
         luck_player = 1.0
-        if Inventory.has_bunny_paw:
+        if player.has_bunny_paw:
             luck_player = 1.5
-        drop_rate = drop_rate0 * luck_player
-        return max(1, int(drop_rate))
+        weight = weight0 * luck_player
+        return max(1, int(weight))
     
-    def generate_rooms(self, player_inventory: Inventory):
+    def generate_rooms(self, player: Inventory):
         all_rooms = list(self.__rooms)
         
         free_rooms = [r for r in all_rooms if r.price == 0]
         chosen_rooms = []
         
         if free_rooms:
-            free_dr = [self.drop_rate(r, player_inventory) for r in free_rooms]
-            guaranted_free_room = random.choices(free_rooms, weights=free_dr, k=1)[0]
+            free_weight = [self.weight(r, player) for r in free_rooms]
+            guaranted_free_room = random.choices(free_rooms, weights=free_weight, k=1)[0]
             chosen_rooms.append(guaranted_free_room)
-            all_rooms.remove(guaranted_free_room) # To make we don't have the same room twice
+            all_rooms.remove(guaranted_free_room) # To make sure we don't have the same room twice
+
+        while len(chosen_rooms) < 3 :
+            w = [self.weight(r, player) for r in all_rooms]
+            chosen_room = random.choices(all_rooms, weights=w, k=1)[0]
+            chosen_rooms.append(chosen_room)
+            all_rooms.remove(chosen_room)
+        
+        return chosen_rooms
