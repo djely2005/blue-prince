@@ -1,18 +1,18 @@
 from abc import ABC, abstractmethod
 from src.entities.door import Door
 from src.entities.object import Object
+from src.utils.rarity import Rarity
 import pygame
 
 
 class Room(ABC):
     """Abstract base class for all types of rooms in Blue Prince."""
 
-    def __init__(self, name: str, price: int, doors: list[Door], interactables: list[Object]=[]):
+    def __init__(self, name: str, price: int, doors: list[Door], rarity: Rarity, interactables: list[Object]=[]):
         self.__name = name
-        # maybe we can put the rarity of room with an enum
-        # self.rarity = rarity # 0: common / 1:standard / 2:unusual / 3:rare
         self.__price = price
         self.__doors = doors  # list each elements has a direction and a key
+        self.__rarity = rarity # 0: common / 1:standard / 2:unusual / 3:rare
         self.__interactables = interactables or [] # contains special objects like digging spots
     # Maybe we gonna add more methods like post_effect or draft_effect
     
@@ -38,11 +38,28 @@ class Room(ABC):
         self.__doors = doors
 
     @property
+    def rarity(self):
+        return self.__rarity
+    @rarity.setter
+    def rarity(self, rarity):
+        self.__rarity = rarity
+
+    @property
     def interactables(self):
         return self.__interactables
     @interactables.setter
     def interactables(self, interactables):
         self.__interactables = interactables
+
+    @abstractmethod
+    def apply_effect(self, player):
+        """Applies the room's special effect when the player enters."""
+        pass
+
+    @abstractmethod
+    def draft_effect(self, player):
+        """Applies the room's special effect when the player drafts."""
+        pass
 
     def __repr__(self):
         return f"<{self.name} (Cost={self.price})>"

@@ -1,5 +1,6 @@
 from src.utils.lock_state import LockState
 from src.utils.direction import Direction
+from src.entities.inventory import Inventory
 
 class Door :
     def __init__(self, lock_state: LockState, direction: Direction):
@@ -19,3 +20,22 @@ class Door :
     @direction.setter
     def direction(self, direction):
         self.__direction = direction
+
+    # Iam not sure if this method should be added here ?
+    def open_door(self, inventory) -> bool:
+        """Open the door with the keys of the player's inventory"""  
+        if self.__lock_state == LockState.UNLOCKED:
+            return True
+            
+        elif self.__lock_state == LockState.LOCKED:
+            if Inventory.can_open_level1_for_free():
+                return True
+            return inventory.try_spend_key()
+            
+        elif self.__lock_state == LockState.DOUBLE_LOCKED:
+            Inventory.try_spend_key()
+            return Inventory.try_spend_key()
+            
+        return False
+
+    
