@@ -1,8 +1,8 @@
-
 from abc import ABC, abstractmethod
-from door import Door
+from src.entities.door import Door
 from src.entities.object import Object
 from src.utils.rarity import Rarity
+import pygame
 
 
 class Room(ABC):
@@ -62,5 +62,23 @@ class Room(ABC):
         pass
 
     def __repr__(self):
-        return f"<{self.name} (Rarity={self.rarity}, Cost={self.price})>"
+        return f"<{self.name} (Cost={self.price})>"
+    
+    def draw(self, screen: pygame.Surface, pos: tuple[int, int], size: int):
+        """
+            Draw the sprite of the room
+        """
+        x, y = pos
+        rect = pygame.Rect(x, y, size, size)
+
+        # Base color (you can change based on rarity or price)
+        pygame.draw.rect(screen, (200, 200, 200), rect)
+        pygame.draw.rect(screen, (50, 50, 50), rect, 2)
+
+        # Draw the name
+        font = pygame.font.Font(None, 18)
+        text = font.render(self.name, True, (0, 0, 0))
+        screen.blit(text, (x + 5, y + 5))
+
+        # Draw doors (optional)
 

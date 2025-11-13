@@ -1,6 +1,6 @@
 # Blueprint
 from src.entities.room import Room
-from door import Door
+from src.entities.door import Door
 from src.entities.object import Object
 from src.entities.inventory import Inventory
 from src.utils.rarity import Rarity
