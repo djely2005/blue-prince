@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from src.entities.door import Door
 from src.entities.object import Object
 import pygame
-
+from src.utils.direction import Direction
 
 class Room(ABC):
     """Abstract base class for all types of rooms in Blue Prince."""
@@ -64,4 +64,11 @@ class Room(ABC):
         screen.blit(text, (x + 5, y + 5))
 
         # Draw doors (optional)
+    
+    def door_direction_exists(self, direction: Direction):
+        exists = False
+        for door in self.doors:
+            exists = exists or (direction == door.direction)
+        
+        return exists
 

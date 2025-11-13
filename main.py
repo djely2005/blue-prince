@@ -4,7 +4,6 @@ import pygame
 import sys
 from src.settings import *
 from src.entities.map import Map
-from src.entities.blue_room import BlueRoom
 from src.entities.door import Door
 from src.utils.lock_state import LockState
 from src.utils.direction import Direction
