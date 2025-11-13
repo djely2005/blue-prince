@@ -6,6 +6,8 @@ from src.settings import *
 import math
 from src.entities.rooms import ante_chambre, entrance_hall
 import random
+from src.entities.inventory import Inventory
+from src.utils.direction import Direction
 
 class Map:
     def __init__(self, seed: int):
@@ -69,3 +71,36 @@ class Map:
         random_door = random.choice(room.doors)
         # draw Room and change doors direction
         pass
+    def request_move(self, current_position: tuple[int, int], future_position: tuple[int, int], player: Inventory):
+        # Making sure we are inside the map
+        if not (future_position[0] < GRID_HEIGHT and future_position[1] < GRID_WIDTH):
+            return False
+        # Making sure we have a room
+        if not self.__grid[current_position[0]][current_position[1]]:
+            return False
+        
+        direction_r = future_position[0] - current_position[0]
+        direction_c = future_position[1] - current_position[1]
+
+        move_direction = None
+        if direction_r == -1 and direction_c == 0 :
+            move_direction = Direction.TOP
+        elif direction_r == 1 and direction_c == 0 :
+            move_direction = Direction.BOTTOM
+        elif direction_r == 0 and direction_c == -1 :
+            move_direction = Direction.LEFT
+        elif direction_r == 0 and direction_c == 1 :
+            move_direction = Direction.RIGHT
+        else :
+            return False
+        
+        door_to_target = None
+        for door in Room.doors:
+            if door.direction == move_direction:
+                door_to_target = door
+                break
+        
+        if not door_to_target:
+            return False 
+
+        return door_to_target.open_door(player)
