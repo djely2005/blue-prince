@@ -72,6 +72,13 @@ laundry_room = YellowRoom(
     rarity=Rarity.RARE
 )
 
+Locksmith = YellowRoom(
+    name="Locksmith",
+    price=1,
+    doors=[Door(LockState.UNLOCKED, Direction.BOTTOM)],
+    rarity=Rarity.UNUSUAL
+)
+
 bedroom = VioletRoom(
     name="BedRoom", 
     price=0, 
@@ -138,6 +145,7 @@ FULL_ROOM_DECK = [
     pantry,
     commissary,
     laundry_room,
+    Locksmith,
     bedroom,
     boudoir,
     hallway,
