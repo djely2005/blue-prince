@@ -4,16 +4,18 @@ from src.entities.object import Object
 from src.utils.rarity import Rarity
 import pygame
 from src.utils.direction import Direction
+import random
 
 class Room(ABC):
     """Abstract base class for all types of rooms in Blue Prince."""
 
-    def __init__(self, name: str, price: int, doors: list[Door], rarity: Rarity, interactables: list[Object]=[]):
+    def __init__(self, name: str, price: int, doors: list[Door], rarity: Rarity, possible_items: list[Object]=[]):
         self.__name = name
         self.__price = price
         self.__doors = doors  # list each elements has a direction and a key
         self.__rarity = rarity # 0: common / 1:standard / 2:unusual / 3:rare
-        self.__interactables = interactables or [] # contains special objects like digging spots
+        self.__possible_items = possible_items or [] # contains special objects
+        self.__available_items = []
     # Maybe we gonna add more methods like post_effect or draft_effect
     
     @property
@@ -45,11 +47,8 @@ class Room(ABC):
         self.__rarity = rarity
 
     @property
-    def interactables(self):
-        return self.__interactables
-    @interactables.setter
-    def interactables(self, interactables):
-        self.__interactables = interactables
+    def available_items(self):
+        return self.__available_items
 
     @abstractmethod
     def apply_effect(self, player):
@@ -88,4 +87,16 @@ class Room(ABC):
             exists = exists or (direction == door.direction)
         
         return exists
-
+    
+    def room_available_item(self, luck: float):
+        """Generate one object based on the player luck"""
+        self.__available_items = []
+        for item in self.__possible_items:
+            base_probability, item_class, init_args = item
+            
+            final_probability = base_probability * luck
+            
+            if random.random() < final_probability:
+                new_item = item_class(**init_args)
+                self.__available_items.append(new_item)
+                break
