@@ -1,12 +1,13 @@
 # Blueprint
 from src.entities.room import Room
 from door import Door
-from src.entities.object import Object
+
 from src.entities.inventory import Inventory
 from src.utils.rarity import Rarity
 from src.entities.other_item import OtherItem
 from src.entities.permanent_item import PermanentItem
 from src.entities.consumable_item import ConsumableItem
+from src.entities.bunny_paw import BunnyPaw
 
 # !!!!!! THIS need to be verified because I did it before you defined the classes needed
 # My structure : name_room: (probability, type, list[name, quantity])
@@ -20,13 +21,15 @@ possible_items = {
         (0.30, ConsumableItem, {'name': 'Gem', 'quantity': 1}),
         (0.25, ConsumableItem, {'name': 'Key', 'quantity': 1}),
         (0.20, PermanentItem, {'name': 'Metal Detector', 'quantity': 1}),
-        (0.15, PermanentItem, {'name': 'Shovel', 'quantity': 1})
+        (0.15, PermanentItem, {'name': 'Shovel', 'quantity': 1}),
+        (0.05, BunnyPaw, {'name': 'BunnyPaw', 'quantity': 1})
     ],
     "Nook": [
         (0.30, ConsumableItem, {'name': 'Die', 'quantity': 1})
     ],
     "Den": [
-        (0.30, ConsumableItem, {'name': 'Die', 'quantity': 1})
+        (0.30, ConsumableItem, {'name': 'Die', 'quantity': 1}),
+        (0.05, BunnyPaw, {'name': 'BunnyPaw', 'quantity': 1})
     ],
     "Pantry": [
         (0.35, OtherItem, {'name': 'Appel', 'quantity': 1}),

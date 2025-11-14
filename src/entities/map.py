@@ -130,3 +130,16 @@ class Map:
             return LockState.LOCKED
         else: # 30% chances to have an UNLOCKED
             return LockState.UNLOCKED
+        
+    # (Dans la classe Map de map.py)
+
+    def prepare_room_doors(self, room_template: Room, row_index: int):
+        """ Modify the lock state of a room's door"""
+        if room_template.name == "Entrance Hall" or room_template.name == "Antechamber":
+            return room_template
+
+        for door in room_template.doors:
+            new_lock_state = self.__get_random_lockstate(row_index)
+            door.lock_state = new_lock_state
+        
+        return room_template
