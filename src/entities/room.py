@@ -16,6 +16,7 @@ class Room(ABC):
         self.__rarity = rarity # 0: common / 1:standard / 2:unusual / 3:rare
         self.__possible_items = possible_items or [] # contains special objects
         self.__available_items = []
+        self.__visited = False
     # Maybe we gonna add more methods like post_effect or draft_effect
     
     @property
@@ -24,6 +25,13 @@ class Room(ABC):
     @name.setter
     def name(self, name):
         self.__name = name
+
+    @property
+    def visited(self):
+        return self.__visited
+    @visited.setter
+    def visited(self, visited):
+        self.__visited = visited
 
     @property
     def price(self):
@@ -56,7 +64,7 @@ class Room(ABC):
         pass
 
     @abstractmethod
-    def draft_effect(self, player):
+    def on_draft(self, player):
         """Applies the room's special effect when the player drafts."""
         pass
 
