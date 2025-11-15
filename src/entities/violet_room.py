@@ -8,7 +8,6 @@ from src.entities.permanent_item import PermanentItem
 from src.entities.consumable_item import ConsumableItem
 from src.entities.player import Player
 import random
-from src.entities.map import Map
 
 # !!!!!! THIS need to be verified because I did it before you defined the classes needed
 # My structure : name_room: (probability, type, list[name, quantity])
@@ -57,7 +56,7 @@ class Bedroom(VioletRoom):
 
 
 class Boudoir(VioletRoom):
-    def __init__(self, name: str, price: int, doors: list[Door], rarity: Rarity, map: Map, player: Player):
+    def __init__(self, name: str, price: int, doors: list[Door], rarity: Rarity, map, player: Player):
         super().__init__(name, price, doors, rarity, possible_items=possible_items)
         self.number_of_steps = map.luck_radint(1, 5, player)
     def on_enter(self, player: Player):
