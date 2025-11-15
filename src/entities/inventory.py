@@ -19,51 +19,45 @@ class Inventory:
     # We use clear verbs and explicit intent.
     def spend_steps(self, n: int) -> None:
         """Lose n steps. If steps reach 0, game over logic is handled by the scene/game loop."""
-        self.steps = max(0, self.steps - n)
+        self.steps.quantity = self.steps.quantity - n
+        # Game should be over if negative
 
     def add_steps(self, n: int) -> None:
         """Foods add movement points (+2, +3, +10, +15, +25)."""
-        self.steps += n
+        self.steps.quantity += n
 
-    def try_spend_gems(self, n: int) -> bool:
+    def spend_gems(self, n: int) -> bool:
         """Return True if gems paid; else False (UI should block the choice)."""
-        if self.gems >= n:
-            self.gems -= n
+        if self.gems.quantity >= n:
+            self.gems.quantity -= n
             return True
         return False
+    def add_gems(self, n: int) -> bool:
+        self.gems.quantity += n
 
-    def try_spend_key(self) -> bool:
+    def spend_keys(self) -> bool:
         """Consume a key if available."""
-        if self.keys > 0:
-            self.keys -= 1
+        if self.keys.quantity > 0:
+            self.keys.quantity -= 1
             return True
         return False
 
-    def can_open_level1_for_free(self) -> bool:
-        """Lock pick allows level-1 doors without consuming a key."""
-        return self.has_lock_pick
-    # Maybe it's needed when we entry a room or a shop
-    def lose_steps(self, n :int):
-        self.steps -= n
+    def add_keys(self, n: int) -> bool:
+        self.keys.quantity += n
 
-    def add_keys(self, n: int):
-        self.keys += n
 
-    def add_gems(self, n: int):
-        self.gems += n
-
-    def add_money(self, n: int):
-        self.money += n
-
-    def try_spend_money(self, n: int) -> bool:
+    def spend_money(self, n: int) -> bool:
         """Return True if money paid; else False (UI should block the choice)."""
-        if self.money > 0:
-            self.money -= n
+        if self.money.quantity > 0:
+            self.money.quantity -= n
             return True
         return False
     
+    def add_money(self, n: int):
+        self.money.quantity += n
     # I wanted to add a method that verify if the player had a permanent item
     # The purpose of LaundryRoom is trading money, keys or gems
+    # This method shouldn't be here
     def swap_gem_money(self, choice: str):
         player_money = self.money
         player_gems = self.gems
