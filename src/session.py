@@ -1,6 +1,7 @@
 import random
 from src.entities.player import Player
-
+from src.settings import *
+from src.entities.inventory import Inventory
 class Session():
     def __init__(self, player:Player,seed: int):
         self.__seed = seed
@@ -21,3 +22,7 @@ class Session():
         biased = r ** bias
 
         return int(min_val + biased * (max_val - min_val))
+
+player = Player((GRID_WIDTH // 2, MAP_WIDTH // 2 ), Inventory())
+
+session = Session(player, 0)

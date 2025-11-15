@@ -3,7 +3,6 @@ from typing import Tuple
 from src.entities.inventory import Inventory
 from src.utils.direction import Direction
 import pygame
-
 # keep long/explicit names
 _DIRECTION_DELTAS = {
     "Z": (-1, 0),  # up  (AZERTY)
@@ -23,7 +22,7 @@ class Player:
         self.__inventory: Inventory = inventory
         self.selected: Direction = None
         self.__luck: float = 1.0
-        self._selection_sprite = pygame.image.load(r'SelectionImage.png')
+        self._selection_sprite = pygame.image.load('player.png')
     @property
     def luck(self):
         return self.__luck
@@ -31,23 +30,7 @@ class Player:
     @luck.setter
     def luck(self, value):
         self.__luck = value
-    def try_move_with_key(self, key_label: str, game_map: MansionMap) -> MoveResult:
-        """
-        Ask the map if we can move. If allowed, update position and spend 1 step.
-        key_label: 'Z','Q','S','D' or 'UP','LEFT','DOWN','RIGHT'.
-        """
-        delta = _DIRECTION_DELTAS.get(key_label.upper())
-        if not delta:
-            return MoveResult(False, "INVALID_KEY")
-
-        r, c = self.grid_position
-        target = (r + delta[0], c + delta[1])
-
-        result = game_map.request_move(self.grid_position, target, self.inventory)
-        if result.allowed:
-            self.grid_position = target
-            self.inventory.spend_steps(1)
-        return result
+    # Function was useless
     @property
     def inventory(self):
         return self.__inventory
@@ -73,7 +56,6 @@ class Player:
 
     def spend_gems(self, value):
         self.inventory.spend_gems(value)
-    
     
     def spend_keys(self, value):
         self.inventory.spend_keys(value)

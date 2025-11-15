@@ -10,6 +10,7 @@ from src.entities.consumable_item import ConsumableItem
 from src.entities.bunny_paw import BunnyPaw
 from src.utils.lock_state import LockState
 from src.utils.direction import Direction
+from src.session import session
 
 # !!!!!! THIS need to be verified because I did it before you defined the classes needed
 # My structure : name_room: (probability, type, list[name, quantity])
@@ -45,7 +46,7 @@ possible_items = {
 
 class BlueRoom(Room):
     def __init__(self, name: str, price: int, doors: list[Door], rarity: Rarity, possible_items = [], img_path: str = ''):
-        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path = img_path)
+        super().__init__(name, price, doors, rarity, session, possible_items= possible_items, img_path = img_path)
     @abstractmethod
     def on_enter(self, player):
         return super().on_enter(player)
@@ -75,7 +76,7 @@ class EntranceHall(BlueRoom):
         ]
         rarity = Rarity.COMMON
         possible_items = [] # To define
-        super().__init__(name, price, doors, rarity, possible_items= possible_items)
+        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path='rooms/Entrance_Hall.webp')
     
     def on_enter(self, player: Player):
         # WIN
@@ -94,7 +95,7 @@ class Parlor(BlueRoom):
         ]
         rarity = Rarity.COMMON
         possible_items = [] # To define
-        super().__init__(name, price, doors, rarity, possible_items= possible_items)
+        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path='rooms/Parlor.webp')
     
     def on_enter(self, player: Player):
         # WIN
@@ -114,7 +115,7 @@ class Nook(BlueRoom):
         rarity = Rarity.COMMON
         possible_items = [] # To define
         possible_items = [] # To define
-        super().__init__(name, price, doors, rarity, possible_items= possible_items)
+        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path='rooms/Nook.png')
     
     def on_enter(self, player: Player):
         if (self.visited): return
@@ -136,7 +137,7 @@ class Den(BlueRoom):
         rarity = Rarity.COMMON
         possible_items = []
         possible_items = [] # To define
-        super().__init__(name, price, doors, rarity, possible_items= possible_items)
+        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path='rooms/Den.webp')
     
     def on_enter(self, player: Player):
         if (self.visited): return
@@ -157,7 +158,7 @@ class Pantary(BlueRoom):
         rarity = Rarity.COMMON
         possible_items = []
         possible_items = [] # To define
-        super().__init__(name, price, doors, rarity, possible_items= possible_items)
+        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path='rooms/Pantry.png')
     
     def on_enter(self, player: Player):
         if (self.visited): return
@@ -178,7 +179,7 @@ class Antechamber(BlueRoom):
         ]
         rarity = Rarity.COMMON
         possible_items = [] # To define
-        super().__init__(name, price, doors, rarity, possible_items= possible_items)
+        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path='rooms/Antechamber.webp')
     
     def on_enter(self, player: Player):
         # WIN
@@ -196,7 +197,7 @@ class Closet(BlueRoom):
         ]
         rarity = Rarity.COMMON
         possible_items = [] # To define
-        super().__init__(name, price, doors, rarity, possible_items= possible_items)
+        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path='rooms/Closet.webp')
     
     def on_enter(self, player: Player):
         pass

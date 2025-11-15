@@ -7,6 +7,7 @@ from src.entities.map import Map
 from src.entities.door import Door
 from src.utils.lock_state import LockState
 from src.utils.direction import Direction
+from src.session import session
 
 
 pool = [

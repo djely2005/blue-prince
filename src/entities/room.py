@@ -11,7 +11,7 @@ from src.session import Session
 class Room(ABC):
     """Abstract base class for all types of rooms in Blue Prince."""
 
-    def __init__(self, session : Session, name: str, price: int, doors: list[Door], rarity: Rarity, possible_items: list[Object]=[]):
+    def __init__(self, name: str, price: int, doors: list[Door], rarity: Rarity, session : Session, possible_items: list[Object]=[], img_path = ''):
         self.__name = name
         self.session = session
         self.__price = price
@@ -129,19 +129,14 @@ class Room(ABC):
         rect = pygame.Rect(x, y, size, size)
 
         # Image logic
-        if self.__spite:
-            scale_spite = pygame.transform.scale(self.__spite, (size, size))
-            screen.blit(scale_spite)
+        if self.__sprite:
+            scale_sprite = pygame.transform.scale(self.__sprite, (size, size))
+            screen.blit(scale_sprite, (x, y))
         else:
             # Base color (you can change based on rarity or price)
             pygame.draw.rect(screen, (200, 200, 200), rect)
         
         pygame.draw.rect(screen, (50, 50, 50), rect, 2) # contour?
-
-        # Draw the name
-        font = pygame.font.Font(None, 18)
-        text = font.render(self.name, True, (0, 0, 0))
-        screen.blit(text, (x + 5, y + 5))
 
         # Draw doors (optional)
 
