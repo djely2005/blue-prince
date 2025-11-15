@@ -58,6 +58,13 @@ class Room(ABC):
     def available_items(self):
         return self.__available_items
 
+    @property
+    def possible_item(self):
+        return self.__possible_items
+    
+    @possible_item.setter
+    def possible_item(self, value):
+        self.__possible_items = value
     @abstractmethod
     def on_enter(self, player):
         """Applies the room's special effect when the player enters."""
