@@ -1,46 +1,50 @@
-
-# src/entities/player.py
-from typing import Tuple
-
+from typing import Tuple, Optional
 import pygame
 
 from src.entities.inventory import Inventory
-from src.entities.map import Map  # Map is in entities/map.py
+from src.entities.map import Map
+from src.utils.direction import Direction
 
 
-# Mapping from key labels to (row_delta, col_delta) on the grid
-_DIRECTION_DELTAS: dict[str, Tuple[int, int]] = {
-    "Z": (-1, 0),   # up    (AZERTY)
-    "Q": (0, -1),   # left
-    "S": (1,  0),   # down
-    "D": (0,  1),   # right
-    # also allow arrows for convenience
-    "UP":    (-1, 0),
-    "LEFT":  (0, -1),
-    "DOWN":  (1, 0),
-    "RIGHT": (0, 1),
+# Mapping from key labels to Direction
+_KEY_TO_DIRECTION = {
+    "Z": Direction.TOP,
+    "Q": Direction.LEFT,
+    "S": Direction.BOTTOM,
+    "D": Direction.RIGHT,
+
+    "UP": Direction.TOP,
+    "LEFT": Direction.LEFT,
+    "DOWN": Direction.BOTTOM,
+    "RIGHT": Direction.RIGHT,
+}
+
+
+# Direction → movement delta on the grid
+_DIRECTION_DELTAS = {
+    Direction.TOP:    (-1, 0),
+    Direction.BOTTOM: (1, 0),
+    Direction.LEFT:   (0, -1),
+    Direction.RIGHT:  (0, 1),
 }
 
 
 class Player:
-    def __init__(self, grid_position: Tuple[int, int], inventory: Inventory) -> None:
-        # (row, col) on the Map grid
-        self.grid_position: Tuple[int, int] = grid_position
+    """
+    Represents the player on the map grid.
 
-        # Inventory containing steps, money, gems, keys, etc.
+    - grid_position: (row, col) in the Map grid
+    - inventory: steps, money, gems, keys, etc.
+    """
+
+    def __init__(self, grid_position: Tuple[int, int], inventory: Inventory) -> None:
+        self.grid_position: Tuple[int, int] = grid_position
         self.__inventory: Inventory = inventory
 
-        # Optional: last selected direction as a string ("Z","Q","UP",...)
-        self.selected: str | None = None
-
-        # Luck coefficient (can be used by room effects / items)
+        self.selected: Optional[Direction] = None
         self.__luck: float = 1.0
 
-        # TEMP: selection sprite loaded directly by pygame.
-        # You can replace this with a nicer system later if you want.
-        self._selection_sprite = pygame.image.load("SelectionImage.png")
-
-    # ---------- Properties ----------
+    # ----- Properties -----
 
     @property
     def luck(self) -> float:
@@ -54,61 +58,41 @@ class Player:
     def inventory(self) -> Inventory:
         return self.__inventory
 
-    # ---------- Movement ----------
+    # ----- Movement -----
 
     def try_move_with_key(self, key_label: str, game_map: Map) -> bool:
         """
-        Try to move one tile according to a key label.
-        key_label: 'Z','Q','S','D' or 'UP','LEFT','DOWN','RIGHT'.
-
-        - Asks Map.request_move(...) if the move is allowed.
-        - If allowed, updates grid_position and spends 1 step.
-        - Returns True if the move succeeded, False otherwise.
+        Convert key press → Direction → movement.
+        Ask Map if move allowed. If yes, update grid_position and spend 1 step.
         """
-        delta = _DIRECTION_DELTAS.get(key_label.upper())
-        if not delta:
-            # Invalid key, ignore the input
+        direction = _KEY_TO_DIRECTION.get(key_label.upper())
+        if not direction:
             return False
 
-        r, c = self.grid_position
-        target = (r + delta[0], c + delta[1])
+        dr, dc = _direction_delta = _DIRECTION_DELTAS[direction]
+        row, col = self.grid_position
+        target = (row + dr, col + dc)
 
-        # In your current map.py, request_move returns a bool
         can_move = game_map.request_move(
             current_position=self.grid_position,
             future_position=target,
-            player=self.inventory,  # Map will pass this to door.open_door()
+            player=self.inventory,   # Map uses Inventory to check locks/keys
         )
 
         if can_move:
-            # Update player position and spend 1 step
             self.grid_position = target
             self.inventory.spend_steps(1)
 
         return can_move
 
-    # ---------- Inventory helper methods ----------
+    # ----- Inventory helpers -----
 
-    def add_steps(self, value: int) -> None:
-        self.inventory.add_steps(value)
+    def add_steps(self, value: int): self.inventory.add_steps(value)
+    def add_money(self, value: int): self.inventory.add_money(value)
+    def add_gems(self, value: int): self.inventory.add_gems(value)
+    def add_keys(self, value: int): self.inventory.add_keys(value)
 
-    def add_money(self, value: int) -> None:
-        self.inventory.add_money(value)
-
-    def add_gems(self, value: int) -> None:
-        self.inventory.add_gems(value)
-
-    def add_keys(self, value: int) -> None:
-        self.inventory.add_keys(value)
-
-    def spend_steps(self, value: int) -> None:
-        self.inventory.spend_steps(value)
-
-    def spend_money(self, value: int) -> None:
-        self.inventory.spend_money(value)
-
-    def spend_gems(self, value: int) -> None:
-        self.inventory.spend_gems(value)
-
-    def spend_keys(self, value: int) -> None:
-        self.inventory.spend_keys(value)
+    def spend_steps(self, value: int): self.inventory.spend_steps(value)
+    def spend_money(self, value: int): self.inventory.spend_money(value)
+    def spend_gems(self, value: int): self.inventory.spend_gems(value)
+    def spend_keys(self, value: int): self.inventory.spend_keys(value)
