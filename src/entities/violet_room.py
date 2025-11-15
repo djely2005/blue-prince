@@ -31,8 +31,8 @@ possible_items = {
 }
 
 class VioletRoom(Room):
-    def __init__(self, name: str, price: int, doors: list[Door], rarity: Rarity, number_of_steps: int = 1):
-        super().__init__(name, price, doors, rarity, possible_items=possible_items)
+    def __init__(self, name: str, price: int, doors: list[Door], rarity: Rarity, number_of_steps: int = 1, img_path: str = ''):
+        super().__init__(name, price, doors, rarity, possible_items=possible_items, image_path = image_path)
         self.__number_of_steps = number_of_steps
     
     @property

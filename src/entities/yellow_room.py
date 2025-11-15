@@ -32,9 +32,9 @@ possible_items = {
 }
 
 class YellowRoom(Room):
-    def __init__(self, name: str, price: int, doors: list[Door], rarity: Rarity, possible_items = []):
+    def __init__(self, name: str, price: int, doors: list[Door], rarity: Rarity, possible_items = [], img_path: str):
         # Possible Item to buy or exchange
-        super().__init__(name, price, doors, rarity, possible_items= possible_items)
+        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path= spite)
 
     def apply_effect(self, player: Inventory, player_choice: str):
         if self.name == "Commissary" :

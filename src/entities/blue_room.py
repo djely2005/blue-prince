@@ -44,8 +44,8 @@ possible_items = {
 }
 
 class BlueRoom(Room):
-    def __init__(self, name: str, price: int, doors: list[Door], rarity: Rarity, possible_items = []):
-        super().__init__(name, price, doors, rarity, possible_items= possible_items)
+    def __init__(self, name: str, price: int, doors: list[Door], rarity: Rarity, possible_items = [], img_path: str = ''):
+        super().__init__(name, price, doors, rarity, possible_items= possible_items, , img_path = img_path)
     @abstractmethod
     def on_enter(self, player):
         return super().on_enter(player)

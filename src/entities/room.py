@@ -5,6 +5,7 @@ from src.utils.rarity import Rarity
 import pygame
 from src.utils.direction import Direction
 import random
+from src.utils.assets import load_image
 from src.session import Session
 
 class Room(ABC):
@@ -18,6 +19,7 @@ class Room(ABC):
         self.__rarity = rarity # 0: common / 1:standard / 2:unusual / 3:rare
         self.__possible_items = possible_items or [] # contains special objects
         self.__available_items = []
+        self.__sprite = load_image(img_path)
         self.__visited = False
     # Maybe we gonna add more methods like post_effect or draft_effect
     
@@ -126,9 +128,15 @@ class Room(ABC):
         x, y = pos
         rect = pygame.Rect(x, y, size, size)
 
-        # Base color (you can change based on rarity or price)
-        pygame.draw.rect(screen, (200, 200, 200), rect)
-        pygame.draw.rect(screen, (50, 50, 50), rect, 2)
+        # Image logic
+        if self.__spite:
+            scale_spite = pygame.transform.scale(self.__spite, (size, size))
+            screen.blit(scale_spite)
+        else:
+            # Base color (you can change based on rarity or price)
+            pygame.draw.rect(screen, (200, 200, 200), rect)
+        
+        pygame.draw.rect(screen, (50, 50, 50), rect, 2) # contour?
 
         # Draw the name
         font = pygame.font.Font(None, 18)
@@ -136,6 +144,8 @@ class Room(ABC):
         screen.blit(text, (x + 5, y + 5))
 
         # Draw doors (optional)
+
+
     
     def door_direction_exists(self, direction: Direction):
         exists = False
