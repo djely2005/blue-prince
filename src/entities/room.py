@@ -5,12 +5,14 @@ from src.utils.rarity import Rarity
 import pygame
 from src.utils.direction import Direction
 import random
+from src.session import Session
 
 class Room(ABC):
     """Abstract base class for all types of rooms in Blue Prince."""
 
-    def __init__(self, name: str, price: int, doors: list[Door], rarity: Rarity, possible_items: list[Object]=[]):
+    def __init__(self, session : Session, name: str, price: int, doors: list[Door], rarity: Rarity, possible_items: list[Object]=[]):
         self.__name = name
+        self.session = session
         self.__price = price
         self.__doors = doors  # list each elements has a direction and a key
         self.__rarity = rarity # 0: common / 1:standard / 2:unusual / 3:rare
@@ -62,6 +64,45 @@ class Room(ABC):
 
     def __repr__(self):
         return f"<{self.name} (Cost={self.price})>"
+    
+
+    def generateAvailableItems (self) ->None:
+        nbPossibleItems:int =  len(self.__possible_items)
+        nbAvailableItems:int = self.session.luck_radint(0,nbPossibleItems+1)
+        maxRarity :int = self.__possible_items[0].rarity.value
+
+        for i in range(1,nbPossibleItems+1):
+            if(self.__possible_items[i].rarity.value > maxRarity):
+                maxRarity = self.__possible_items[i].rarity.value
+            
+
+        r:int = self.session.luck_radint(0,maxRarity+1)
+
+        while(nbAvailableItems>0):
+            iterationList:list[Object] = [] 
+
+            for item in self.__possible_items:
+                if( item not in self.__possible_items and item.rarity.value >= r ):
+                    iterationList.append(item)
+            
+            iterationListSize:int = len(iterationList) 
+            
+            if(iterationListSize == 0):
+                maxRarity = maxRarity-1
+                r = self.session.luck_radint(0,maxRarity+1)
+            
+            elif (iterationListSize >1):
+                randomIndex:int = random.randint(0, iterationListSize-1)
+                self.__available_items.append(self.__possible_items[randomIndex]) 
+                nbAvailableItems = nbAvailableItems-1
+            
+            elif(iterationListSize == 1):
+                self.__available_items.append(self.__possible_items[0]) 
+                nbAvailableItems = nbAvailableItems-1
+            
+
+
+        
     
     def draw(self, screen: pygame.Surface, pos: tuple[int, int], size: int):
         """

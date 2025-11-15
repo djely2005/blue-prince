@@ -18,12 +18,7 @@ class Map:
         self.__grid[0][math.ceil(GRID_WIDTH/2)] = ante_chambre
         self.random = random.Random(seed)
         
-    def luck_radint(self, min_val, max_val, player: Player):
-        r = self.random.random()
-        bias = 1 / (1 + player.luck)
-        biased = r ** bias
 
-        return int(min_val + biased * (max_val - min_val))
     @property
     def seed(self, seed):
         self.__seed = seed
