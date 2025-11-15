@@ -28,9 +28,9 @@ possible_items = {
 }
 
 class YellowRoom(Room):
-    def __init__(self, name: str, price: int, doors: list[Door], rarity: Rarity):
-        super().__init__(name, price, doors, rarity, possible_items= possible_items)
-
+    def __init__(self, name: str, price: int, doors: list[Door], rarity: Rarity, img_path: str):
+        super().__init__(name, price, doors, rarity, img_path= spite, possible_items= possible_items)
+        
     def apply_effect(self, player: Inventory, player_choice: str):
         if self.name == "Commissary" :
             pass

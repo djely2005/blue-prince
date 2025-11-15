@@ -29,9 +29,9 @@ possible_items = {
 }
 
 class VioletRoom(Room):
-    def __init__(self, name: str, price: int, doors: list[Door], rarity: Rarity):
-        super().__init__(name, price, doors, rarity, possible_items=possible_items)
-    
+    def __init__(self, name: str, price: int, doors: list[Door], rarity: Rarity, img_path: str):
+        super().__init__(name, price, doors, rarity, img_path= spite, possible_items= possible_items)
+            
     def apply_effect(self, player: Inventory):
         if self.name == "Bedroom":
             player.add_steps(2)
