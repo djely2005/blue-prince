@@ -17,7 +17,7 @@ possible_items = {
 
 class RedRoom(Room):
     def __init__(self, name: str, price: int, doors: list[Door], rarity: Rarity, img_path: str):
-        super().__init__(name, price, doors, rarity, img_path= spite, possible_items= possible_items)
+        super().__init__(name, price, doors, rarity, img_path= img_path, possible_items= possible_items)
             
     def apply_effect(self, player: Inventory):
         if self.name == "Lavatory" :
