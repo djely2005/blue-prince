@@ -2,9 +2,37 @@
 
 import pygame
 import sys
-from settings import *
+from src.settings import *
+from src.entities.map import Map
+from src.entities.door import Door
+from src.utils.lock_state import LockState
+from src.utils.direction import Direction
 
 
+pool = [
+    {
+        "name": "Antechamber",
+        "price": 0,
+        "doors": [
+            Door(LockState.DOUBLE_LOCKED, Direction.BOTTOM),
+            Door(LockState.DOUBLE_LOCKED, Direction.RIGHT),
+            Door(LockState.DOUBLE_LOCKED, Direction.LEFT),
+        ],
+        "interactables": [],
+        
+    },
+    {
+        "name": "Antechamber",
+        "price": 0,
+        "doors": [
+            Door(LockState.DOUBLE_LOCKED, Direction.BOTTOM),
+            Door(LockState.DOUBLE_LOCKED, Direction.RIGHT),
+            Door(LockState.DOUBLE_LOCKED, Direction.LEFT),
+        ],
+        "interactables": []
+    },
+
+]
 
 # Change to a class HUD
 def draw_info_panel(screen):
@@ -31,6 +59,7 @@ def main():
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Blue Prince - Prototype Display")
     clock = pygame.time.Clock()
+    map = Map(0)
 
     while True:
         for event in pygame.event.get():
@@ -40,7 +69,7 @@ def main():
 
         # --- Draw everything ---
         screen.fill(DARK_BLUE)
-        draw_map_area(screen)
+        map.draw(screen)
         draw_info_panel(screen)
 
         pygame.display.flip()
