@@ -7,7 +7,7 @@ import math
 from src.entities.rooms import ante_chambre, entrance_hall
 import random
 from src.entities.inventory import Inventory
-from src.utils.direction import Direction
+from src.utils.lock_state import LockState
 
 class Map:
     def __init__(self, seed: int):
@@ -71,12 +71,14 @@ class Map:
         random_door = random.choice(room.doors)
         # draw Room and change doors direction
         pass
+
     def request_move(self, current_position: tuple[int, int], future_position: tuple[int, int], player: Inventory):
         # Making sure we are inside the map
         if not (future_position[0] < GRID_HEIGHT and future_position[1] < GRID_WIDTH):
             return False
         # Making sure we have a room
-        if not self.__grid[current_position[0]][current_position[1]]:
+        current_room = self.__grid[current_position[0]][current_position[1]]
+        if not current_room:
             return False
         
         direction_r = future_position[0] - current_position[0]
@@ -95,7 +97,7 @@ class Map:
             return False
         
         door_to_target = None
-        for door in Room.doors:
+        for door in current_room.doors:
             if door.direction == move_direction:
                 door_to_target = door
                 break
@@ -104,3 +106,40 @@ class Map:
             return False 
 
         return door_to_target.open_door(player)
+
+    def __get_random_lockstate(self, row_index: int) -> LockState:
+        """Find the lock state of a door based on the row_index of map"""
+        start_row = math.ceil(GRID_HEIGHT / 2)
+        end_row = 0                         
+
+        if row_index == start_row: # level 0
+            return LockState.UNLOCKED
+
+        if row_index == end_row: # the last level
+            return LockState.DOUBLE_LOCKED
+
+        total_distance = start_row - end_row
+        current_distance = start_row - row_index
+        progress = current_distance / total_distance
+        
+        rand_val = random.random()
+
+        if rand_val < (progress * 0.5): # 50% chances to have a DOUBLE_LOCKED
+            return LockState.DOUBLE_LOCKED
+        elif rand_val < (progress * 0.8): # 80% chances to have a LOCKED
+            return LockState.LOCKED
+        else: # 30% chances to have an UNLOCKED
+            return LockState.UNLOCKED
+        
+    # (Dans la classe Map de map.py)
+
+    def prepare_room_doors(self, room_template: Room, row_index: int):
+        """ Modify the lock state of a room's door"""
+        if room_template.name == "Entrance Hall" or room_template.name == "Antechamber":
+            return room_template
+
+        for door in room_template.doors:
+            new_lock_state = self.__get_random_lockstate(row_index)
+            door.lock_state = new_lock_state
+        
+        return room_template

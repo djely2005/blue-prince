@@ -3,12 +3,14 @@ from src.utils.lock_state import LockState
 from src.utils.direction import Direction
 from src.utils.rarity import Rarity
 from src.entities.inventory import Inventory
+from src.entities.bunny_paw import BunnyPaw
 import random
 
 class RoomPicker :
-    def __init__(self, rooms: list[Room], refresh_price : int):
+    def __init__(self, rooms: list[Room], refresh_price : int, luck: BunnyPaw):
         self.__rooms = rooms
         self.__refresh_price = refresh_price
+        self.__luck = luck
 
     @property
     def rooms(self):
@@ -24,12 +26,16 @@ class RoomPicker :
     def refresh_price(self, refresh_price):
         self.__refresh_price = refresh_price
 
-    def weight(self, room: Room, player: Inventory):
+    @property
+    def luck(self):
+        return self.__luck
+    @luck.setter
+    def luck(self, luck):
+        self.__luck = luck
+
+    def weight(self, room: Room):
         weight0 = room.rarity.value
-        luck_player = 1.0
-        if player.has_bunny_paw:
-            luck_player = 1.5
-        weight = weight0 * luck_player
+        weight = weight0 * self.__luck
         return max(1, int(weight))
     
     def generate_rooms(self, player: Inventory):

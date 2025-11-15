@@ -1,12 +1,35 @@
 from src.entities.room import Room
 from door import Door
-from src.entities.object import Object
-from src.utils.rarity import Rarity
 from src.entities.inventory import Inventory
+from src.utils.rarity import Rarity
+from src.entities.consumable_item import ConsumableItem
+
+# !!!!!! THIS need to be verified because I did it before you defined the classes needed
+# My structure : name_room: (probability, type, list[name, quantity])
+possible_items = {
+    "LaundryRoom": [
+        (0.27, ConsumableItem, {'name': 'Gold', 'quantity': 1}),
+        (0.25, ConsumableItem, {'name': 'Gold', 'quantity': 2}),
+        (0.23, ConsumableItem, {'name': 'Gold', 'quantity': 3}),
+        (0.20, ConsumableItem, {'name': 'Gold', 'quantity': 4}),
+        (0.17, ConsumableItem, {'name': 'Gold', 'quantity': 5}),
+        (0.15, ConsumableItem, {'name': 'Gold', 'quantity': 6}),
+        (0.15, ConsumableItem, {'name': 'Key', 'quantity': 1})
+        # the first number is for probability I just did a random number we can change it later if needed
+    ],
+    "Kitchen": [
+        (0.25, ConsumableItem, {'name': 'Gold', 'quantity': 2}),
+        (0.20, ConsumableItem, {'name': 'Gold', 'quantity': 3}),
+        (0.15, ConsumableItem, {'name': 'Gold', 'quantity': 5}),
+        (0.2, ConsumableItem, {'name': 'Gem', 'quantity': 1}),
+        (0.15, ConsumableItem, {'name': 'Key', 'quantity': 1})
+    ]
+
+}
 
 class YellowRoom(Room):
-    def __init__(self, name: str, price: int, doors: list[Door], rarity: Rarity, interactables: list[Object]=[]):
-        super().__init__(name, price, doors, rarity, interactables)
+    def __init__(self, name: str, price: int, doors: list[Door], rarity: Rarity):
+        super().__init__(name, price, doors, rarity, possible_items= possible_items)
 
     def apply_effect(self, player: Inventory, player_choice: str):
         if self.name == "Commissary" :

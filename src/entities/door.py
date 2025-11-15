@@ -22,19 +22,19 @@ class Door :
         self.__direction = direction
 
     # Iam not sure if this method should be added here ?
-    def open_door(self, inventory) -> bool:
+    def open_door(self, player: Inventory) -> bool:
         """Open the door with the keys of the player's inventory"""  
         if self.__lock_state == LockState.UNLOCKED:
             return True
             
         elif self.__lock_state == LockState.LOCKED:
-            if Inventory.can_open_level1_for_free():
+            if player.can_open_level1_for_free():
                 return True
-            return inventory.try_spend_key()
+            return player.try_spend_key()
             
         elif self.__lock_state == LockState.DOUBLE_LOCKED:
-            Inventory.try_spend_key()
-            return Inventory.try_spend_key()
+            player.try_spend_key()
+            return player.try_spend_key() # 2 keys
             
         return False
 

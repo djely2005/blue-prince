@@ -58,13 +58,6 @@ pantry = BlueRoom(
     rarity=Rarity.COMMON
 )
 
-commissary = YellowRoom(
-    name="Commissary",
-    price=1, 
-    doors=[Door(LockState.UNLOCKED, Direction.BOTTOM), Door(LockState.UNLOCKED, Direction.LEFT)], 
-    rarity=Rarity.STANDARD
-)
-
 laundry_room = YellowRoom(
     name="LaundryRoom",
     price=1,
@@ -143,7 +136,6 @@ FULL_ROOM_DECK = [
     nook,
     den,
     pantry,
-    commissary,
     laundry_room,
     Locksmith,
     bedroom,
