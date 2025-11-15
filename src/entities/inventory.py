@@ -76,3 +76,8 @@ class Inventory:
 
 
 
+    def has_any_permanent_tools(self) -> bool:
+        return any([
+            self._has_shovel, self._has_hammer, self._has_lock_pick,
+            self._has_metal_detector, self._has_bunny_paw
+        ])

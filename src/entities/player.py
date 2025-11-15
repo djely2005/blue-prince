@@ -31,7 +31,23 @@ class Player:
     @luck.setter
     def luck(self, value):
         self.__luck = value
+    def try_move_with_key(self, key_label: str, game_map: MansionMap) -> MoveResult:
+        """
+        Ask the map if we can move. If allowed, update position and spend 1 step.
+        key_label: 'Z','Q','S','D' or 'UP','LEFT','DOWN','RIGHT'.
+        """
+        delta = _DIRECTION_DELTAS.get(key_label.upper())
+        if not delta:
+            return MoveResult(False, "INVALID_KEY")
 
+        r, c = self.grid_position
+        target = (r + delta[0], c + delta[1])
+
+        result = game_map.request_move(self.grid_position, target, self.inventory)
+        if result.allowed:
+            self.grid_position = target
+            self.inventory.spend_steps(1)
+        return result
     @property
     def inventory(self):
         return self.__inventory
