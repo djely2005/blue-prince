@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from src.entities.room import Room
 from src.entities.door import Door
 from src.entities.inventory import Inventory
@@ -8,73 +9,52 @@ from src.utils.direction import Direction
 from src.entities.shop_item import ShopItem
 from src.entities.player import Player
 from src.utils.consumable_type import ConsumableType
-# !!!!!! THIS need to be verified because I did it before you defined the classes needed
-# My structure : name_room: (probability, type, list[name, quantity])
-possible_items = {
-    "LaundryRoom": [
-        (0.27, ConsumableItem, {'name': 'Gold', 'quantity': 1}),
-        (0.25, ConsumableItem, {'name': 'Gold', 'quantity': 2}),
-        (0.23, ConsumableItem, {'name': 'Gold', 'quantity': 3}),
-        (0.20, ConsumableItem, {'name': 'Gold', 'quantity': 4}),
-        (0.17, ConsumableItem, {'name': 'Gold', 'quantity': 5}),
-        (0.15, ConsumableItem, {'name': 'Gold', 'quantity': 6}),
-        (0.15, ConsumableItem, {'name': 'Key', 'quantity': 1})
-        # the first number is for probability I just did a random number we can change it later if needed
-    ],
-    "Kitchen": [
-        (0.25, ConsumableItem, {'name': 'Gold', 'quantity': 2}),
-        (0.20, ConsumableItem, {'name': 'Gold', 'quantity': 3}),
-        (0.15, ConsumableItem, {'name': 'Gold', 'quantity': 5}),
-        (0.2, ConsumableItem, {'name': 'Gem', 'quantity': 1}),
-        (0.15, ConsumableItem, {'name': 'Key', 'quantity': 1})
-    ]
-
-}
+from src.entities.permanent_item import PermanentItem
+from src.utils.permanent_type import PermanentType
 
 class YellowRoom(Room):
     def __init__(self, name: str, price: int, doors: list[Door], rarity: Rarity, possible_items = [], img_path: str = ''):
         # Possible Item to buy or exchange
         super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path= img_path)
 
-    def apply_effect(self, player: Inventory, player_choice: str):
-        if self.name == "Commissary" :
-            pass
+    @abstractmethod
+    def on_enter(self, player):
+        return super().on_enter(player)
+    
+    @abstractmethod
+    def on_draft(self, player):
+        return super().on_draft(player)
+    
+    # Not sure if I leave it because I am not about shop_items ?
 
-        elif self.name == "LaundryRoom":
-            if player_choice:
-                player.swap_gem_gold
-        
-        elif self.name == "Locksmith":
-            if player_choice == "Key":
-                if player.try_spend_gold(5):
-                    player.add_keys(1)
-            elif player_choice == "Set of Keys":
-                if player.try_spend_gold(12):
-                    player.add_keys(3)
-            elif player_choice == "Special Key":
-                if player.try_spend_gold(10) and player.has_lock_pick: # TRUE and FALSE
-                    not player.has_lock_pick
+    @abstractmethod
+    def shop(self, player, choice: str):
+        return super().shop(player, choice)
+    
+    def apply_effect(self, player):
+        pass
 
-    # To open the shop I think we need to do it in main
-
-
-# Find how to implement
 class LaundryRoom(YellowRoom):
     def __init__(self, player):
         name = "Laundry Room"
         price = 1
-        doors = [
-            Door(LockState.DOUBLE_LOCKED, Direction.BOTTOM)
-        ]
+        doors = [Door(LockState.DOUBLE_LOCKED, Direction.BOTTOM)]
         rarity = Rarity.RARE
+        sprite_path = "rooms/laundry_room.png"
         possible_items = [
-            ShopItem(
-                ConsumableItem("Gems", )
-            )
-        ]
-        super().__init__(name, price, doors, rarity)
+                            (0.27, ConsumableItem, {'name': 'Gold', 'quantity': 1}),
+                            (0.25, ConsumableItem, {'name': 'Gold', 'quantity': 2}),
+                            (0.23, ConsumableItem, {'name': 'Gold', 'quantity': 3}),
+                            (0.20, ConsumableItem, {'name': 'Gold', 'quantity': 4}),
+                            (0.17, ConsumableItem, {'name': 'Gold', 'quantity': 5}),
+                            (0.15, ConsumableItem, {'name': 'Gold', 'quantity': 6}),
+                            (0.15, ConsumableItem, {'name': 'Key', 'quantity': 1})
+        ]   
+        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path= sprite_path)
+    
     def on_draft(self, player):
         return super().on_draft(player)
+    
     def on_enter(self, player):
         self.possible_item = [
             ShopItem(
@@ -88,11 +68,88 @@ class LaundryRoom(YellowRoom):
             ShopItem(
                 ConsumableItem("Keys", self.__get_player_money() - 5, ConsumableType.KEY),
                 self.__get_player_gems()
+            )
+
+        ]
+        return super().on_enter(player)
+    
+    def __get_player_gems(self, player: Player):
+        return player.inventory.gems.quantity
+    
+    def __get_player_money(self, player: Player):
+        return player.inventory.money.quantity
+    
+    def shop(self, player: Inventory, choice: str) -> bool: 
+        if choice == "Spin Cycle":
+            if player.try_spend_gold(5):
+                player.inventory.swap_resources(choice)
+                return True
+        
+        elif choice == "Wash & Dry":
+            if player.try_spend_gold(5):
+                player.swap_resources(choice)
+                return True
+        
+        elif choice == "Fluff & Fold":
+            if player.try_spend_gold(10):
+                player.swap_resources(choice)
+                return True
+        
+        return False
+    
+class Locksmith(YellowRoom):
+    def __init__(self):
+        name = "Locksmith"
+        price = 1
+        doors = [Door(LockState.UNLOCKED, Direction.BOTTOM)]
+        rarity = Rarity.UNUSUAL
+        sprite_path = "rooms/Locksmith.png"
+        possible_items = [
+                        (0.25, ConsumableItem, {'name': 'Gold', 'quantity': 2}),
+                        (0.20, ConsumableItem, {'name': 'Gold', 'quantity': 3}),
+                        (0.15, ConsumableItem, {'name': 'Gold', 'quantity': 5}),
+                        (0.2, ConsumableItem, {'name': 'Gem', 'quantity': 1}),
+                        (0.15, ConsumableItem, {'name': 'Key', 'quantity': 1})
+    ]
+        
+        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path= sprite_path)
+
+    def on_draft(self, player):
+        return super().on_draft(player)
+    
+    def on_enter(self, player):
+        self.possible_item = [
+            ShopItem(
+                ConsumableItem("Keys", self.__get_player_money() - 5, ConsumableType.KEY),
+                self.__get_player_money()
+            ),
+            ShopItem(
+                ConsumableItem("Keys", self.__get_player_money() - 12, ConsumableType.KEY),
+                self.__get_player_money()
+            ),
+            ShopItem(
+                PermanentItem("Keys", self.__get_player_money() - 10, PermanentType.LOCKPICK),
+                self.__get_player_gems()
             ),
 
         ]
         return super().on_enter(player)
-    def __get_player_gems(self, player: Player):
-        return player.inventory.gems.quantity
-    def __get_player_money(self, player: Player):
-        return player.inventory.money.quantity
+
+    def shop(self, player: Inventory, choice: str) -> bool:
+        
+        if choice == "Key":
+            if player.try_spend_gold(5):
+                player.add_keys(1)
+                return True
+        
+        elif choice == "Set of Keys":
+            if player.try_spend_gold(12):
+                player.add_keys(3)
+                return True
+        
+        elif choice == "Lockpick":
+            if player.try_spend_gold(10) and player.has_lock_pick: # True and False
+                player.has_lock_pick = True
+                return True 
+        
+        return False

@@ -57,24 +57,20 @@ class Inventory:
     
     def add_money(self, n: int):
         self.money.quantity += n
-    # I wanted to add a method that verify if the player had a permanent item
-    # The purpose of LaundryRoom is trading money, keys or gems
-    # This method shouldn't be here
-    def swap_gem_money(self, choice: str):
+    
+    def swap_resources(self, choice: str):
         player_money = self.money
         player_gems = self.gems
         player_key = self.keys
-        if choice == "SpinCycle":
+        if choice == "Spin Cycle":
             self.money = player_gems
             self.gems = player_money
-        if choice == "washDry" :
+        if choice == "wash & Dry" :
             self.gems = player_key
             self.keys = player_gems
-        if choice == "FliffFold":
+        if choice == "Fliff & Fold":
             self.money = player_key
             self.keys = player_money
-
-
 
     def has_any_permanent_tools(self) -> bool:
         return any([

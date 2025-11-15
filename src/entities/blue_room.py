@@ -46,6 +46,7 @@ possible_items = {
 class BlueRoom(Room):
     def __init__(self, name: str, price: int, doors: list[Door], rarity: Rarity, possible_items = [], img_path: str = ''):
         super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path = img_path)
+    
     @abstractmethod
     def on_enter(self, player):
         return super().on_enter(player)
@@ -53,16 +54,13 @@ class BlueRoom(Room):
     @abstractmethod
     def on_draft(self, player):
         return super().on_draft(player)
+    
+    @abstractmethod
+    def shop(self, player, choice: str):
+        return super().shop(player)
 
     def apply_effect(self, player: Player):
-        if self.name == "Nook":
-            player.add_keys(1)
-        elif self.name == "Den":
-            player.add_gems(1)
-        elif self.name == "Pantry":
-            player.add_money(4)
-        elif self.name == "Antechamber":
-            print("You Win") # Maybe we can add a fon win in game to restart the game or insert a funny photo 
+        pass
 
 class EntranceHall(BlueRoom):
     def __init__(self):
@@ -74,8 +72,9 @@ class EntranceHall(BlueRoom):
             Door(LockState.DOUBLE_LOCKED, Direction.RIGHT),
         ]
         rarity = Rarity.COMMON
-        possible_items = [] # To define
-        super().__init__(name, price, doors, rarity, possible_items= possible_items)
+        possible_items = []
+        sprite_path="rooms/entrance_hall.png"
+        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path= sprite_path)
     
     def on_enter(self, player: Player):
         # WIN
@@ -83,6 +82,9 @@ class EntranceHall(BlueRoom):
     
     def on_draft(self, player):
         pass
+    
+    def shop(self, player, choice: str):
+        return super().shop(player, choice)
 
 class Parlor(BlueRoom):
     def __init__(self):
@@ -93,15 +95,18 @@ class Parlor(BlueRoom):
             Door(LockState.DOUBLE_LOCKED, Direction.LEFT),
         ]
         rarity = Rarity.COMMON
-        possible_items = [] # To define
-        super().__init__(name, price, doors, rarity, possible_items= possible_items)
+        possible_items = [0.30, OtherItem, {'name': 'Appel', 'quantity': 1}]
+        sprite_path="rooms/parlor.png"
+        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path= sprite_path)
     
     def on_enter(self, player: Player):
-        # WIN
         pass
     
     def on_draft(self, player):
         pass
+    
+    def shop(self, player, choice: str):
+        return super().shop(player, choice)
 
 class Nook(BlueRoom):
     def __init__(self):
@@ -112,9 +117,9 @@ class Nook(BlueRoom):
             Door(LockState.DOUBLE_LOCKED, Direction.LEFT),
         ]
         rarity = Rarity.COMMON
-        possible_items = [] # To define
-        possible_items = [] # To define
-        super().__init__(name, price, doors, rarity, possible_items= possible_items)
+        possible_items = [0.30, ConsumableItem, {'name': 'Die', 'quantity': 1}]
+        sprite_path="rooms/nook.png"
+        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path= sprite_path)
     
     def on_enter(self, player: Player):
         if (self.visited): return
@@ -123,6 +128,9 @@ class Nook(BlueRoom):
     
     def on_draft(self, player):
         return super().on_draft(player)
+    
+    def shop(self, player, choice: str):
+        return super().shop(player, choice)
     
 class Den(BlueRoom):
     def __init__(self):
@@ -134,9 +142,12 @@ class Den(BlueRoom):
             Door(LockState.DOUBLE_LOCKED, Direction.RIGHT)
         ]
         rarity = Rarity.COMMON
-        possible_items = []
-        possible_items = [] # To define
-        super().__init__(name, price, doors, rarity, possible_items= possible_items)
+        possible_items = [
+                            (0.30, ConsumableItem, {'name': 'Die', 'quantity': 1}),
+                            (0.05, BunnyPaw, {'name': 'BunnyPaw', 'quantity': 1})
+        ]
+        sprite_path="rooms/den.png"
+        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path= sprite_path)
     
     def on_enter(self, player: Player):
         if (self.visited): return
@@ -145,6 +156,9 @@ class Den(BlueRoom):
     
     def on_draft(self, player):
         return super().on_draft(player)
+    
+    def shop(self, player, choice: str):
+        return super().shop(player, choice)
 
 class Pantary(BlueRoom):
     def __init__(self):
@@ -155,9 +169,15 @@ class Pantary(BlueRoom):
             Door(LockState.DOUBLE_LOCKED, Direction.LEFT),
         ]
         rarity = Rarity.COMMON
-        possible_items = []
-        possible_items = [] # To define
-        super().__init__(name, price, doors, rarity, possible_items= possible_items)
+        possible_items = [
+                            (0.35, OtherItem, {'name': 'Appel', 'quantity': 1}),
+                            (0.25, OtherItem, {'name': 'Appel', 'quantity': 3}),
+                            (0.20, OtherItem, {'name': 'Banana', 'quantity': 1}),
+                            (0.15, OtherItem, {'name': 'Banana', 'quantity': 2}),
+                            (0.15, OtherItem, {'name': 'Orange', 'quantity': 1})
+    ]
+        sprite_path="rooms/pantry.png"
+        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path= sprite_path)
     
     def on_enter(self, player: Player):
         if (self.visited): return
@@ -166,6 +186,9 @@ class Pantary(BlueRoom):
     
     def on_draft(self, player):
         return super().on_draft(player)
+    
+    def shop(self, player, choice: str):
+        return super().shop(player, choice)
 
 class Antechamber(BlueRoom):  
     def __init__(self):
@@ -177,8 +200,9 @@ class Antechamber(BlueRoom):
             Door(LockState.DOUBLE_LOCKED, Direction.RIGHT),
         ]
         rarity = Rarity.COMMON
-        possible_items = [] # To define
-        super().__init__(name, price, doors, rarity, possible_items= possible_items)
+        possible_items = []
+        sprite_path="rooms/ante_chambre.png"
+        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path= sprite_path)
     
     def on_enter(self, player: Player):
         # WIN
@@ -186,6 +210,9 @@ class Antechamber(BlueRoom):
     
     def on_draft(self, player):
         pass
+    
+    def shop(self, player, choice: str):
+        return super().shop(player, choice)
 
 class Closet(BlueRoom):  
     def __init__(self):
@@ -195,11 +222,22 @@ class Closet(BlueRoom):
             Door(LockState.DOUBLE_LOCKED, Direction.BOTTOM),
         ]
         rarity = Rarity.COMMON
-        possible_items = [] # To define
-        super().__init__(name, price, doors, rarity, possible_items= possible_items)
+        possible_items = [
+                            (0.35, ConsumableItem, {'name': 'Die', 'quantity': 1}),
+                            (0.30, ConsumableItem, {'name': 'Gem', 'quantity': 1}),
+                            (0.25, ConsumableItem, {'name': 'Key', 'quantity': 1}),
+                            (0.20, PermanentItem, {'name': 'Metal Detector', 'quantity': 1}),
+                            (0.15, PermanentItem, {'name': 'Shovel', 'quantity': 1}),
+                            (0.05, BunnyPaw, {'name': 'BunnyPaw', 'quantity': 1})
+    ]
+        sprite_path="rooms/closet.png"
+        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path= sprite_path)
     
     def on_enter(self, player: Player):
         pass
     
     def on_draft(self, player):
         pass
+    
+    def shop(self, player, choice: str):
+        return super().shop(player, choice)
