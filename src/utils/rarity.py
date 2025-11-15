@@ -1,7 +1,7 @@
 from enum import Enum
 
 class Rarity(Enum):
-    COMMON = 27
-    STANDARD = 9
-    UNUSUAL = 3
-    RARE = 1
+    COMMON = 0
+    STANDARD = 1
+    UNUSUAL = 2
+    RARE = 3

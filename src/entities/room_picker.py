@@ -1,4 +1,4 @@
-from room import Room
+from src.entities.room import Room
 from src.utils.lock_state import LockState
 from src.utils.direction import Direction
 from src.utils.rarity import Rarity

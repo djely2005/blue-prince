@@ -51,7 +51,7 @@ class Room(ABC):
         return self.__available_items
 
     @abstractmethod
-    def apply_effect(self, player):
+    def on_enter(self, player):
         """Applies the room's special effect when the player enters."""
         pass
 

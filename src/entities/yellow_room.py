@@ -1,5 +1,5 @@
 from src.entities.room import Room
-from door import Door
+from src.entities.door import Door
 from src.entities.inventory import Inventory
 from src.utils.rarity import Rarity
 from src.entities.consumable_item import ConsumableItem
@@ -51,3 +51,4 @@ class YellowRoom(Room):
                     not player.has_lock_pick
 
     # To open the shop I think we need to do it in main
+    
