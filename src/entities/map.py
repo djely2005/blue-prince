@@ -8,6 +8,7 @@ from src.entities.rooms import ante_chambre, entrance_hall
 import random
 from src.entities.inventory import Inventory
 from src.utils.lock_state import LockState
+from src.entities.player import Player
 
 class Map:
     def __init__(self, seed: int):
@@ -15,10 +16,9 @@ class Map:
         self.__grid: list[Room] = [[entrance_hall for _ in range(GRID_WIDTH)] for _ in range(GRID_HEIGHT)]
         self.__grid[math.ceil(GRID_HEIGHT/2)][math.ceil(GRID_WIDTH/2)] = entrance_hall
         self.__grid[0][math.ceil(GRID_WIDTH/2)] = ante_chambre
-        random.seed(seed)
+        self.random = random.Random(seed)
         
-        
-    
+
     @property
     def seed(self, seed):
         self.__seed = seed

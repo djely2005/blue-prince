@@ -1,13 +1,15 @@
 # Blueprint
 from src.entities.room import Room
-from door import Door
-
-from src.entities.inventory import Inventory
+from src.entities.door import Door
+from abc import abstractmethod
+from src.entities.player import Player
 from src.utils.rarity import Rarity
 from src.entities.other_item import OtherItem
 from src.entities.permanent_item import PermanentItem
 from src.entities.consumable_item import ConsumableItem
 from src.entities.bunny_paw import BunnyPaw
+from src.utils.lock_state import LockState
+from src.utils.direction import Direction
 
 # !!!!!! THIS need to be verified because I did it before you defined the classes needed
 # My structure : name_room: (probability, type, list[name, quantity])
@@ -42,19 +44,162 @@ possible_items = {
 }
 
 class BlueRoom(Room):
-    def __init__(self, name: str, price: int, doors: list[Door], rarity: Rarity, img_path: str):
-        super().__init__(name, price, doors, rarity, img_path= spite, possible_items= possible_items)
+    def __init__(self, name: str, price: int, doors: list[Door], rarity: Rarity, possible_items = [], img_path: str = ''):
+        super().__init__(name, price, doors, rarity, possible_items= possible_items, , img_path = img_path)
+    @abstractmethod
+    def on_enter(self, player):
+        return super().on_enter(player)
     
-    def apply_effect(self, player: Inventory):
+    @abstractmethod
+    def on_draft(self, player):
+        return super().on_draft(player)
+
+    def apply_effect(self, player: Player):
         if self.name == "Nook":
             player.add_keys(1)
         elif self.name == "Den":
             player.add_gems(1)
         elif self.name == "Pantry":
-            player.add_gold(4)
+            player.add_money(4)
         elif self.name == "Antechamber":
             print("You Win") # Maybe we can add a fon win in game to restart the game or insert a funny photo 
+
+class EntranceHall(BlueRoom):
+    def __init__(self):
+        name = "Entrance Hall"
+        price = 0
+        doors = [
+            Door(LockState.DOUBLE_LOCKED, Direction.TOP),
+            Door(LockState.DOUBLE_LOCKED, Direction.LEFT),
+            Door(LockState.DOUBLE_LOCKED, Direction.RIGHT),
+        ]
+        rarity = Rarity.COMMON
+        possible_items = [] # To define
+        super().__init__(name, price, doors, rarity, possible_items= possible_items)
     
-    def draft_effect(self, player):
+    def on_enter(self, player: Player):
+        # WIN
         pass
     
+    def on_draft(self, player):
+        pass
+
+class Parlor(BlueRoom):
+    def __init__(self):
+        name = "Parlor"
+        price = 0
+        doors = [
+            Door(LockState.DOUBLE_LOCKED, Direction.BOTTOM),
+            Door(LockState.DOUBLE_LOCKED, Direction.LEFT),
+        ]
+        rarity = Rarity.COMMON
+        possible_items = [] # To define
+        super().__init__(name, price, doors, rarity, possible_items= possible_items)
+    
+    def on_enter(self, player: Player):
+        # WIN
+        pass
+    
+    def on_draft(self, player):
+        pass
+
+class Nook(BlueRoom):
+    def __init__(self):
+        name = "Nook"
+        price = 0
+        doors = [
+            Door(LockState.DOUBLE_LOCKED, Direction.BOTTOM),
+            Door(LockState.DOUBLE_LOCKED, Direction.LEFT),
+        ]
+        rarity = Rarity.COMMON
+        possible_items = [] # To define
+        possible_items = [] # To define
+        super().__init__(name, price, doors, rarity, possible_items= possible_items)
+    
+    def on_enter(self, player: Player):
+        if (self.visited): return
+        player.add_keys(1)
+        self.visited = True
+    
+    def on_draft(self, player):
+        return super().on_draft(player)
+    
+class Den(BlueRoom):
+    def __init__(self):
+        name = "Den"
+        price = 0
+        doors = [
+            Door(LockState.DOUBLE_LOCKED, Direction.BOTTOM),
+            Door(LockState.DOUBLE_LOCKED, Direction.LEFT),
+            Door(LockState.DOUBLE_LOCKED, Direction.RIGHT)
+        ]
+        rarity = Rarity.COMMON
+        possible_items = []
+        possible_items = [] # To define
+        super().__init__(name, price, doors, rarity, possible_items= possible_items)
+    
+    def on_enter(self, player: Player):
+        if (self.visited): return
+        player.add_gems(1)
+        self.visited = True
+    
+    def on_draft(self, player):
+        return super().on_draft(player)
+
+class Pantary(BlueRoom):
+    def __init__(self):
+        name = "Pantary"
+        price = 0
+        doors = [
+            Door(LockState.DOUBLE_LOCKED, Direction.BOTTOM),
+            Door(LockState.DOUBLE_LOCKED, Direction.LEFT),
+        ]
+        rarity = Rarity.COMMON
+        possible_items = []
+        possible_items = [] # To define
+        super().__init__(name, price, doors, rarity, possible_items= possible_items)
+    
+    def on_enter(self, player: Player):
+        if (self.visited): return
+        player.add_money(4)
+        self.visited = True
+    
+    def on_draft(self, player):
+        return super().on_draft(player)
+
+class Antechamber(BlueRoom):  
+    def __init__(self):
+        name = "Antechamber"
+        price = 0
+        doors = [
+            Door(LockState.DOUBLE_LOCKED, Direction.BOTTOM),
+            Door(LockState.DOUBLE_LOCKED, Direction.LEFT),
+            Door(LockState.DOUBLE_LOCKED, Direction.RIGHT),
+        ]
+        rarity = Rarity.COMMON
+        possible_items = [] # To define
+        super().__init__(name, price, doors, rarity, possible_items= possible_items)
+    
+    def on_enter(self, player: Player):
+        # WIN
+        pass
+    
+    def on_draft(self, player):
+        pass
+
+class Closet(BlueRoom):  
+    def __init__(self):
+        name = "Closet"
+        price = 0
+        doors = [
+            Door(LockState.DOUBLE_LOCKED, Direction.BOTTOM),
+        ]
+        rarity = Rarity.COMMON
+        possible_items = [] # To define
+        super().__init__(name, price, doors, rarity, possible_items= possible_items)
+    
+    def on_enter(self, player: Player):
+        pass
+    
+    def on_draft(self, player):
+        pass

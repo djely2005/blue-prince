@@ -1,5 +1,5 @@
 from src.entities.room import Room
-from door import Door
+from src.entities.door import Door
 
 from src.utils.rarity import Rarity
 from src.entities.consumable_item import ConsumableItem

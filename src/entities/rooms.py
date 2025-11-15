@@ -1,4 +1,4 @@
-from src.entities.blue_room import BlueRoom
+from src.entities.blue_room import *
 from src.entities.yellow_room import YellowRoom
 from src.entities.violet_room import VioletRoom
 from src.entities.orange_room import OrangeRoom
@@ -9,61 +9,19 @@ from src.utils.direction import Direction
 from src.utils.lock_state import LockState
 from src.utils.rarity import Rarity
 
-entrance_hall = BlueRoom(
-    name="Entrance Hall", 
-    price=0, 
-    doors=[Door(LockState.UNLOCKED, Direction.TOP),Door(LockState.UNLOCKED, Direction.BOTTOM), Door(LockState.UNLOCKED, Direction.RIGHT), Door(LockState.UNLOCKED, Direction.LEFT)],
-    rarity=Rarity.COMMON,
-    sprite_path="rooms/entrance_hall.png"
-)
+entrance_hall = EntranceHall()
 
-ante_chambre = BlueRoom(
-    name="Antechamber", 
-    price=0, 
-    doors=[Door(LockState.UNLOCKED, Direction.BOTTOM)],
-    rarity=Rarity.COMMON,
-    sprite_path="rooms/ante_chambre.png"
-)
+ante_chambre = Antechamber()
 
-parlor = BlueRoom(
-    name="Parlor", 
-    price=0, 
-    doors=[Door(LockState.UNLOCKED, Direction.BOTTOM), Door(LockState.UNLOCKED, Direction.LEFT)],
-    rarity=Rarity.COMMON,
-    sprite_path="rooms/parlor.png"
-)
+parlor = Parlor()
 
-closet = BlueRoom(
-    name="Closet", 
-    price=0, 
-    doors=[Door(LockState.UNLOCKED, Direction.BOTTOM)],
-    rarity=Rarity.COMMON,
-    sprite_path="rooms/closet.png"
-)
+closet = Closet()
 
-nook = BlueRoom(
-    name="Nook",
-    price=0, 
-    doors=[Door(LockState.UNLOCKED, Direction.BOTTOM), Door(LockState.UNLOCKED, Direction.LEFT)], 
-    rarity=Rarity.COMMON,
-    sprite_path="rooms/nook.png"
-)
+nook = Nook()
 
-den = BlueRoom(
-    name="Den",
-    price=1, 
-    doors=[Door(LockState.UNLOCKED, Direction.BOTTOM), Door(LockState.UNLOCKED, Direction.RIGHT), Door(LockState.UNLOCKED, Direction.LEFT)], 
-    rarity=Rarity.COMMON, 
-    sprite_path="rooms/gen.png"
-)
+den = Den()
 
-pantry = BlueRoom(
-    name="Pantry",
-    price=0, 
-    doors=[Door(LockState.UNLOCKED, Direction.BOTTOM), Door(LockState.UNLOCKED, Direction.LEFT)], 
-    rarity=Rarity.COMMON,
-    sprite_path="rooms/pantry.png"
-)
+pantry = Pantary()
 
 laundry_room = YellowRoom(
     name="LaundryRoom",

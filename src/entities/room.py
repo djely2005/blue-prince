@@ -6,18 +6,22 @@ import pygame
 from src.utils.direction import Direction
 import random
 from src.utils.assets import load_image
+from src.session import Session
 
 class Room(ABC):
     """Abstract base class for all types of rooms in Blue Prince."""
 
-    def __init__(self, name: str, price: int, doors: list[Door], rarity: Rarity, img_path: str, possible_items: list[Object]=[]):
+    def __init__(self, session : Session, name: str, price: int, doors: list[Door], rarity: Rarity, possible_items: list[Object]=[]):
         self.__name = name
+        self.session = session
         self.__price = price
         self.__doors = doors  # list each elements has a direction and a key
         self.__rarity = rarity # 0: common / 1:standard / 2:unusual / 3:rare
         self.__possible_items = possible_items or [] # contains special objects
         self.__available_items = []
-        self.__spite = load_image(img_path)
+        self.__sprite = load_image(img_path)
+        self.__visited = False
+    # Maybe we gonna add more methods like post_effect or draft_effect
     
     @property
     def name(self):
@@ -25,6 +29,13 @@ class Room(ABC):
     @name.setter
     def name(self, name):
         self.__name = name
+
+    @property
+    def visited(self):
+        return self.__visited
+    @visited.setter
+    def visited(self, visited):
+        self.__visited = visited
 
     @property
     def price(self):
@@ -51,18 +62,64 @@ class Room(ABC):
     def available_items(self):
         return self.__available_items
 
+    @property
+    def possible_item(self):
+        return self.__possible_items
+    
+    @possible_item.setter
+    def possible_item(self, value):
+        self.__possible_items = value
     @abstractmethod
-    def apply_effect(self, player):
+    def on_enter(self, player):
         """Applies the room's special effect when the player enters."""
         pass
 
     @abstractmethod
-    def draft_effect(self, player):
+    def on_draft(self, player):
         """Applies the room's special effect when the player drafts."""
         pass
 
     def __repr__(self):
         return f"<{self.name} (Cost={self.price})>"
+    
+
+    def generateAvailableItems (self) ->None:
+        nbPossibleItems:int =  len(self.__possible_items)
+        nbAvailableItems:int = self.session.luck_radint(0,nbPossibleItems+1)
+        maxRarity :int = self.__possible_items[0].rarity.value
+
+        for i in range(1,nbPossibleItems+1):
+            if(self.__possible_items[i].rarity.value > maxRarity):
+                maxRarity = self.__possible_items[i].rarity.value
+            
+
+        r:int = self.session.luck_radint(0,maxRarity+1)
+
+        while(nbAvailableItems>0):
+            iterationList:list[Object] = [] 
+
+            for item in self.__possible_items:
+                if( item not in self.__possible_items and item.rarity.value >= r ):
+                    iterationList.append(item)
+            
+            iterationListSize:int = len(iterationList) 
+            
+            if(iterationListSize == 0):
+                maxRarity = maxRarity-1
+                r = self.session.luck_radint(0,maxRarity+1)
+            
+            elif (iterationListSize >1):
+                randomIndex:int = random.randint(0, iterationListSize-1)
+                self.__available_items.append(self.__possible_items[randomIndex]) 
+                nbAvailableItems = nbAvailableItems-1
+            
+            elif(iterationListSize == 1):
+                self.__available_items.append(self.__possible_items[0]) 
+                nbAvailableItems = nbAvailableItems-1
+            
+
+
+        
     
     def draw(self, screen: pygame.Surface, pos: tuple[int, int], size: int):
         """
