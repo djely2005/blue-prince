@@ -35,16 +35,29 @@ class Player:
     @property
     def inventory(self):
         return self.__inventory
+    
     def add_steps(self, value):
         self.inventory.add_steps(value)
     
     def add_money(self, value):
         self.inventory.add_money(value)
 
-    
     def add_gems(self, value):
         self.inventory.add_gems(value)
     
     
     def add_keys(self, value):
         self.inventory.add_keys(value)
+
+    def spend_steps(self, value):
+        self.inventory.spend_steps(value)
+    
+    def spend_money(self, value):
+        self.inventory.spend_money(value)
+
+    def spend_gems(self, value):
+        self.inventory.spend_gems(value)
+    
+    
+    def spend_keys(self, value):
+        self.inventory.spend_keys(value)

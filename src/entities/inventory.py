@@ -7,6 +7,7 @@ from src.utils.consumable_type import ConsumableType
 @dataclass
 class Inventory:
     """Explicit names preferred. Counts start as per spec; adjust if design changes."""
+    # Needs to be private
     permanentItems: PermanentItem = []
     steps: ConsumableItem = ConsumableItem('Steps', 70, ConsumableType.STEP)
     money: ConsumableItem = ConsumableItem('Money', 0, ConsumableType.MONEY)
