@@ -1,4 +1,4 @@
-# Blueprint
+
 from src.entities.room import Room
 from src.entities.door import Door
 from abc import abstractmethod
