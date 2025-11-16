@@ -23,16 +23,6 @@ class BlueRoom(Room):
     def on_draft(self, player):
         return super().on_draft(player)
 
-    def apply_effect(self, player: Player):
-        if self.name == "Nook":
-            player.add_keys(1)
-        elif self.name == "Den":
-            player.add_gems(1)
-        elif self.name == "Pantry":
-            player.add_money(4)
-        elif self.name == "Antechamber":
-            print("You Win") # Maybe we can add a func for win in game to restart the game or show a message 
-
 
 class EntranceHall(BlueRoom):
     def __init__(self):

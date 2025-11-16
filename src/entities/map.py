@@ -380,6 +380,8 @@ class Map:
         player.grid_position = (new_r, new_c)
 
         # Trigger on_enter effect
+        # Provide the map's seeded RNG to the room so room effects (shops) can be deterministic
+        setattr(new_room, '_room_random', self.random)
         new_room.on_enter(player)
 
         # Synchronize adjacent room doors

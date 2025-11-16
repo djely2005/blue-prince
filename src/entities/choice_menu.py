@@ -35,21 +35,31 @@ class ChoiceMenu:
 
     def handle_event(self, event, player):
         # Navigate menu
+        if not self.choices:
+            # No choices available — nothing to do
+            self.selected_index = 0
+            return
+
         if event.type == pygame.KEYDOWN:
+            # Ensure selected_index is within current bounds
+            n = len(self.choices)
+            if self.selected_index >= n:
+                self.selected_index = 0
+
             if event.key == pygame.K_DOWN:
-                self.selected_index = (self.selected_index + 1) % len(self.choices)
+                self.selected_index = (self.selected_index + 1) % n
 
             if event.key == pygame.K_UP:
-                self.selected_index = (self.selected_index - 1) % len(self.choices)
-
+                self.selected_index = (self.selected_index - 1) % n
             if event.key == pygame.K_RETURN:
-                _, callback = self.choices[self.selected_index]
-                callback(player)     # <<< execute chosen action
+                # Double-check index before calling
+                if 0 <= self.selected_index < n:
+                    _, callback = self.choices[self.selected_index]
+                    callback(player)     # <<< execute chosen action
 
 
 menu = ChoiceMenu(
         rect=(MAP_WIDTH + 20, 240, TEXT_WIDTH - 40, 200),
         font=None,
-        choices=[
-        ]
+        choices=[]
     )

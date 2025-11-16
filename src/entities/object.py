@@ -2,7 +2,7 @@ from abc import ABC
 from src.utils.rarity import Rarity
 
 class Object(ABC):
-    def __init__(self, name: str, quantity: int,rarity: Rarity):
+    def __init__(self, name: str, quantity: int,rarity: Rarity = Rarity.COMMON):
         self.__name = name
         self.__rarity = rarity
         self.__quantity = quantity

@@ -1,5 +1,5 @@
 from src.entities.blue_room import *
-from src.entities.yellow_room import YellowRoom
+from src.entities.yellow_room import *
 from src.entities.violet_room import VioletRoom
 from src.entities.orange_room import OrangeRoom
 from src.entities.green_room import GreenRoom
@@ -24,11 +24,16 @@ den = Den()
 
 pantry = Pantry()
 
+commissary = Commissary()
+
+laundry_room = LaundryRoom()
 
 FULL_ROOM_DECK = [
     parlor,
     closet,
     nook,
     den,
-    pantry
+    pantry,
+    commissary,
+    laundry_room
 ]

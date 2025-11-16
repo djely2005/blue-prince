@@ -9,8 +9,8 @@ class Inventory:
         """Explicit names preferred. Counts start as per spec; adjust if design changes."""
         self.permanentItems: list[PermanentItem] = []
         self.steps: ConsumableItem = ConsumableItem('Steps', 70, ConsumableType.STEP)
-        self.money: ConsumableItem = ConsumableItem('Money', 0, ConsumableType.MONEY)
-        self.gems: ConsumableItem = ConsumableItem('Gems', 0, ConsumableType.GEM)
+        self.money: ConsumableItem = ConsumableItem('Money', 50, ConsumableType.MONEY)
+        self.gems: ConsumableItem = ConsumableItem('Gems', 30, ConsumableType.GEM)
         self.keys: ConsumableItem = ConsumableItem('keys', 0, ConsumableType.KEY)
         self.dice: ConsumableItem = ConsumableItem('Dice', 20, ConsumableType.DICE)
         # Keep constructor minimal; avoid side-effects here.
