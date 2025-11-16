@@ -53,10 +53,6 @@ class VioletRoom(Room):
     @abstractmethod
     def on_draft(self, player):
         return super().on_draft(player)
-    
-    @abstractmethod
-    def shop(self, player, choice: str):
-        return super().shop(player, choice)
 
     def apply_effect(self, player: Player):
         pass
@@ -84,8 +80,6 @@ class Bedroom(VioletRoom):
     def on_enter(self, player: Player):
         player.add_steps(self.number_of_steps)
 
-    def shop(self, player, choice: str):
-        return super().shop(player, choice)
 
 
 class Boudoir(VioletRoom):
@@ -111,5 +105,3 @@ class Boudoir(VioletRoom):
     def on_draft(self, player):
         return super().on_draft(player)
     
-    def shop(self, player, choice: str):
-        return super().shop(player, choice)

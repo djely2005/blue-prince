@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from src.entities.permanent_item import PermanentItem
 from src.entities.consumable_item import ConsumableItem
 from src.utils.consumable_type import ConsumableType
+
 # Should we reconsider the implementation of inventory ?
 # I think we need a better structure
 class Inventory:
@@ -13,7 +14,6 @@ class Inventory:
         self.gems: ConsumableItem = ConsumableItem('Gems', 0, ConsumableType.GEM)
         self.keys: ConsumableItem = ConsumableItem('keys', 0, ConsumableType.KEY)
         self.dice: ConsumableItem = ConsumableItem('Dice', 0, ConsumableType.DICE)
-        pass
     # Needs to be private
 
 
