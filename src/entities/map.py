@@ -209,10 +209,16 @@ class Map:
         
         return room_template
 
-    def request_place_room(self, player_pos: tuple[int, int], entry_direction: Direction) -> list[Room]:
+    def request_place_room(self, player_pos: tuple[int, int], entry_direction: Direction, player: Player) -> list[Room]:
         """
         When a door is opened, return 3 random room choices for the player to select from.
+        Room selection is influenced by player luck and current room rarity.
         This does NOT place the room yet; that happens when player selects via handle_room_selection.
+        
+        Args:
+            player_pos: Current player position
+            entry_direction: Direction of the door being opened
+            player: Player object (for luck stat)
         
         Returns:
             List of 3 Room objects to choose from
@@ -220,9 +226,55 @@ class Map:
         # Store the door info for later placement
         self.__pending_door = (player_pos, entry_direction)
         
-        # Select 3 random rooms from the deck
-        choices = self.random.sample(FULL_ROOM_DECK, min(3, len(FULL_ROOM_DECK)))
-        return choices
+        # Get current room to determine rarity context
+        current_room = self.__grid[player_pos[0]][player_pos[1]]
+        current_rarity = current_room.rarity.value if isinstance(current_room, Room) else 0
+        
+        # Use player luck to weight room selection
+        # Higher luck = better (higher rarity) rooms more likely
+        luck_multiplier = player.luck
+        
+        # Create weighted room choices based on rarity and luck
+        weighted_choices = []
+        for room in FULL_ROOM_DECK:
+            room_rarity = room.rarity.value
+            
+            # Calculate weight: higher luck increases chance of rarer rooms
+            # Formula: base_weight * (1 + luck_bonus * relative_rarity)
+            rarity_bonus = max(0, room_rarity - current_rarity) * luck_multiplier
+            base_weight = 1.0
+            final_weight = base_weight + rarity_bonus
+            
+            weighted_choices.append((room, final_weight))
+        
+        # Normalize weights to probabilities
+        total_weight = sum(w for _, w in weighted_choices)
+        probabilities = [w / total_weight for _, w in weighted_choices]
+        rooms = [r for r, _ in weighted_choices]
+        
+        # Use the map's seeded random to select 3 rooms based on weights
+        # Sample without replacement, using weights
+        selected = []
+        remaining_rooms = list(rooms)
+        remaining_probs = list(probabilities)
+        
+        for _ in range(min(3, len(rooms))):
+            if not remaining_rooms:
+                break
+            
+            # Normalize remaining probabilities
+            total = sum(remaining_probs)
+            normalized = [p / total for p in remaining_probs]
+            
+            # Use seeded random to pick one room
+            idx = self.random.choices(range(len(remaining_rooms)), weights=normalized, k=1)[0]
+            selected.append(remaining_rooms[idx])
+            
+            # Remove selected room from remaining
+            remaining_rooms.pop(idx)
+            remaining_probs.pop(idx)
+        
+        return selected
 
     def handle_room_selection(self, selected_room: Room, player: Player) -> bool:
         """
@@ -433,7 +485,6 @@ class Map:
             # Include the room if it exists and has been visited
             if isinstance(adjacent_room, Room) and adjacent_room.visited:
                 adjacent_visited[direction] = adjacent_room
-            print(adjacent_visited)
         return adjacent_visited
 
     def move_to_adjacent_room(self, player: Player, target_direction: Direction) -> bool:

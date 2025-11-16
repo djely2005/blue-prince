@@ -68,7 +68,7 @@ def main():
                 def open_door_callback(player, d=door, pos=session.player.grid_position, direction=session.player.selected):
                     if d.open_door(player):
                         # Door opened successfully, show room selector
-                        room_choices = game_map.request_place_room(pos, direction)
+                        room_choices = game_map.request_place_room(pos, direction, player)
                         room_selector.set_choices(room_choices)
                     else:
                         # Not enough keys
@@ -82,7 +82,6 @@ def main():
         adjacent_visited = game_map.get_adjacent_visited_rooms(session.player.grid_position)
         for direction, room in adjacent_visited.items():
             direction_name = direction.name.capitalize()
-            menu.choices = []
             menu.choices.append(
                 (f"Go {direction_name} ({room.name})", lambda player, d=direction: game_map.move_to_adjacent_room(player, d))
             )
