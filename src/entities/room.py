@@ -23,7 +23,6 @@ class Room(ABC):
         # rotation in 90-degree clockwise steps (0..3). This value is updated by Map when the room is rotated.
         self.__rotation = 0
         self.__visited = False
-    # Maybe we gonna add more methods like post_effect or draft_effect
     
     @property
     def name(self):
@@ -31,13 +30,6 @@ class Room(ABC):
     @name.setter
     def name(self, name):
         self.__name = name
-
-    @property
-    def visited(self):
-        return self.__visited
-    @visited.setter
-    def visited(self, visited):
-        self.__visited = visited
 
     @property
     def price(self):
@@ -70,6 +62,20 @@ class Room(ABC):
     @possible_item.setter
     def possible_item(self, value):
         self.__possible_items = value
+
+    @property
+    def visited(self):
+        return self.__visited
+    @visited.setter
+    def visited(self, visited):
+        self.__visited = visited
+
+    @property
+    def rotation(self):
+        return self.__rotation
+    @rotation.setter
+    def rotation(self, rotation):
+        self.__rotation = rotation
     
     @abstractmethod
     def on_enter(self, player):
@@ -81,14 +87,34 @@ class Room(ABC):
         """Applies the room's special effect when the player drafts."""
         pass
 
-    @abstractmethod
-    def shop(self, player, choice: str):
-        """To create the logic of the yellow rooms"""
-        pass
+    # I tried draw (with rotation)
 
-    def __repr__(self):
-        return f"<{self.name} (Cost={self.price})>"
-    
+    def draw(self, screen: pygame.Surface, pos: tuple[int, int], size: int):
+        """Draw the sprite of the room with tile size. It also applies rotation sent by Map"""
+        x, y = pos
+        rect = pygame.Rect(x, y, size, size)
+
+        if self.__sprite:
+            scaled = pygame.transform.scale(self.__sprite, (size, size))
+
+            # apply rotation (clockwise)
+            angle = -90 * self.__rotation
+            rotated = pygame.transform.rotate(scaled, angle)
+
+            # center the rotated sprite
+            rect = rotated.get_rect(center=rect.center)
+            screen.blit(rotated, rect)
+        else:
+            pygame.draw.rect(screen, (200, 200, 200), (x, y, size, size))
+
+        pygame.draw.rect(screen, (50, 50, 50), rect, 2) # contour?
+
+    def door_direction_exists(self, direction: Direction) -> bool:
+        """Check if this room has a door in a given direction"""
+        for door in self.__doors:
+            if door.direction == direction:
+                return True
+        return False
 
     def generateAvailableItems (self) ->None:
         nbPossibleItems:int =  len(self.__possible_items)
@@ -123,47 +149,7 @@ class Room(ABC):
             elif(iterationListSize == 1):
                 self.__available_items.append(self.__possible_items[0]) 
                 nbAvailableItems = nbAvailableItems-1
-            
 
-
-        
-    
-    def draw(self, screen: pygame.Surface, pos: tuple[int, int], size: int):
-        """
-            Draw the sprite of the room
-        """
-        x, y = pos
-        rect = pygame.Rect(x, y, size, size)
-
-        # Image logic
-        if self.__sprite:
-            scale_sprite = pygame.transform.scale(self.__sprite, (size, size))
-            rotation_steps = getattr(self, '_Room__rotation', 0)
-            if rotation_steps:
-                # pygame.transform.rotate uses degrees counter-clockwise, so negative for clockwise
-                angle = -90 * (rotation_steps + 1)
-                rotated = pygame.transform.rotate(scale_sprite, angle)
-                # keep rotated image centered in the tile
-                rotated_rect = rotated.get_rect(center=(x + size // 2, y + size // 2))
-                screen.blit(rotated, rotated_rect.topleft)
-            else:
-                screen.blit(scale_sprite, (x, y))
-        else:
-            # Base color (you can change based on rarity or price)
-            pygame.draw.rect(screen, (200, 200, 200), rect)
-        
-        pygame.draw.rect(screen, (50, 50, 50), rect, 2) # contour?
-
-        # Draw doors (optional)
-
-
-    
-    def door_direction_exists(self, direction: Direction):
-        exists = False
-        for door in self.doors:
-            exists = exists or (direction == door.direction)
-        
-        return exists
     
     def room_available_item(self, luck: float):
         """Generate one object based on the player luck"""

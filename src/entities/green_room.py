@@ -9,6 +9,7 @@ from src.entities.consumable_item import ConsumableItem
 from src.entities.bunny_paw import BunnyPaw
 from src.utils.lock_state import LockState
 from src.utils.direction import Direction
+from src.session import Session
 
 # !!!!!! THIS need to be verified because I did it before you defined the classes needed
 # My structure : name_room: (probability, type, list[name, quantity])
@@ -31,7 +32,15 @@ possible_items = {
 
 class GreenRoom(Room):
     def __init__(self, name: str, price: int, doors: list[Door], rarity: Rarity, possible_items = [], img_path: str = ''):
-        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path= img_path)
+        super().__init__(
+            name,
+            price,
+            doors,
+            rarity,
+            session=Session,
+            possible_items=possible_items,
+            img_path=img_path
+        )
     
     @abstractmethod
     def on_enter(self, player):
@@ -40,10 +49,6 @@ class GreenRoom(Room):
     @abstractmethod
     def on_draft(self, player):
         return super().on_draft(player)
-    
-    @abstractmethod
-    def shop(self, player, choice: str):
-        return super().shop(player)
 
     def apply_effect(self, player: Player):
         pass
@@ -63,16 +68,21 @@ class Terrace(GreenRoom):
                             (0.30, ConsumableItem, {'name': 'Gold', 'quantity': 2}),
                             (0.20, PermanentItem, {'name': 'Shovel', 'quantity': 3})
         ]
-        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path= sprite_path)
+        super().__init__(
+            name,
+            price,
+            doors,
+            rarity,
+            possible_items=possible_items,
+            img_path=sprite_path
+        )
 
     def on_enter(self, player):
         pass
     
     def on_draft(self, player):
         pass
-    
-    def shop(self, player, choice: str):
-        return super().shop(player, choice)
+
 
 class Veranda(GreenRoom):
     def __init__(self):
@@ -85,13 +95,17 @@ class Veranda(GreenRoom):
                             (0.50, ConsumableItem, {'name': 'Gem', 'quantity': 1}),
                             (0.35, PermanentItem, {'name': 'Shovel', 'quantity': 1})
         ]
-        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path= sprite_path)
+        super().__init__(
+            name,
+            price,
+            doors,
+            rarity,
+            possible_items=possible_items,
+            img_path=sprite_path
+        )
 
     def on_enter(self, player):
         pass
     
     def on_draft(self, player):
         pass
-
-    def shop(self, player, choice: str):
-        return super().shop(player, choice)

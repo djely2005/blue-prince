@@ -1,16 +1,11 @@
 from src.entities.blue_room import *
-from src.entities.yellow_room import *
-from src.entities.violet_room import VioletRoom
-from src.entities.orange_room import OrangeRoom
-from src.entities.green_room import GreenRoom
-from src.entities.red_room import RedRoom
-from src.entities.door import Door
-from src.utils.direction import Direction
-from src.utils.lock_state import LockState
-from src.utils.rarity import Rarity
+from src.entities.yellow_room import LaundryRoom, Locksmith
+from src.entities.violet_room import Bedroom, Boudoir
+from src.entities.orange_room import Hallway, Passageway
+from src.entities.green_room import Veranda, Terrace
+from src.entities.red_room import Gymnasium, Lavatory
 
 entrance_hall = EntranceHall()
-entrance_hall.visited = True
 
 ante_chambre = Antechamber()
 
@@ -22,11 +17,29 @@ nook = Nook()
 
 den = Den()
 
-pantry = Pantry()
-
-commissary = Commissary()
+pantry = Pantary()
 
 laundry_room = LaundryRoom()
+
+locksmith = Locksmith()
+
+bedroom = Bedroom()
+
+boudoir = Boudoir()
+
+hallway = Hallway()
+
+passageway = Passageway()
+
+terrace = Terrace()
+
+veranda = Veranda()
+
+lavatory = Lavatory()
+
+gymnasium = Gymnasium()
+
+# Maybe I can use a deck for room picker 
 
 FULL_ROOM_DECK = [
     parlor,
@@ -34,6 +47,14 @@ FULL_ROOM_DECK = [
     nook,
     den,
     pantry,
-    commissary,
-    laundry_room
+    laundry_room,
+    locksmith,
+    bedroom,
+    boudoir,
+    hallway,
+    passageway,
+    terrace,
+    veranda,
+    lavatory,
+    gymnasium
 ]

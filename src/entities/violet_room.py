@@ -11,6 +11,7 @@ from src.entities.permanent_item import PermanentItem
 from src.entities.consumable_item import ConsumableItem
 from src.entities.player import Player
 import random
+from src.session import Session
 
 # !!!!!! THIS need to be verified because I did it before you defined the classes needed
 # My structure : name_room: (probability, type, list[name, quantity])
@@ -35,7 +36,16 @@ possible_items = {
 
 class VioletRoom(Room):
     def __init__(self, name: str, price: int, doors: list[Door], rarity: Rarity, number_of_steps: int = 1, img_path: str = ''):
-        super().__init__(name, price, doors, rarity, possible_items=possible_items, image_path = img_path)
+        super().__init__(
+            name,
+            price,
+            doors,
+            rarity,
+            session=Session,
+            possible_items=possible_items,
+            img_path=img_path
+        )
+
         self.__number_of_steps = number_of_steps
     
     @property
@@ -53,10 +63,6 @@ class VioletRoom(Room):
     @abstractmethod
     def on_draft(self, player):
         return super().on_draft(player)
-    
-    @abstractmethod
-    def shop(self, player, choice: str):
-        return super().shop(player, choice)
 
     def apply_effect(self, player: Player):
         pass
@@ -76,7 +82,15 @@ class Bedroom(VioletRoom):
                             (0.15, ConsumableItem, {'name': 'Die', 'quantity': 1}),
                             (0.15, ConsumableItem, {'name': 'Key', 'quantity': 1})
         ]
-        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path= sprite_path)
+        super().__init__(
+            name,
+            price,
+            doors,
+            rarity,
+            possible_items=possible_items,
+            img_path=sprite_path
+        )
+
     
     def on_draft(self, player):
         return super().on_draft(player)
@@ -84,8 +98,6 @@ class Bedroom(VioletRoom):
     def on_enter(self, player: Player):
         player.add_steps(self.number_of_steps)
 
-    def shop(self, player, choice: str):
-        return super().shop(player, choice)
 
 
 class Boudoir(VioletRoom):
@@ -102,7 +114,15 @@ class Boudoir(VioletRoom):
                             (0.2, ConsumableItem, {'name': 'Gem', 'quantity': 1}),
                             (0.15, ConsumableItem, {'name': 'Key', 'quantity': 1})
         ]
-        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path= sprite_path)
+        super().__init__(
+            name,
+            price,
+            doors,
+            rarity,
+            possible_items=possible_items,
+            img_path=sprite_path
+        )
+
         self.number_of_steps = map.luck_radint(1, 5, player)
         
     def on_enter(self, player: Player):
@@ -111,5 +131,3 @@ class Boudoir(VioletRoom):
     def on_draft(self, player):
         return super().on_draft(player)
     
-    def shop(self, player, choice: str):
-        return super().shop(player, choice)

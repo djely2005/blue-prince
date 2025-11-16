@@ -9,140 +9,139 @@ from src.utils.direction import Direction
 from src.entities.shop_item import ShopItem
 from src.entities.player import Player
 from src.utils.consumable_type import ConsumableType
-import random
-from src.entities.shovel import Shovel
-from src.entities.metal_detector import MetalDetector
-from src.entities.lock_pick import LockPick
-from src.entities.hammer import Hammer
-from src.entities.bunny_paw import BunnyPaw
-
-from src.session import session
-
+from src.entities.permanent_item import PermanentItem
+from src.utils.permanent_type import PermanentType
+from src.session import Session
 
 class YellowRoom(Room):
     def __init__(self, name: str, price: int, doors: list[Door], rarity: Rarity, possible_items = [], img_path: str = ''):
         # Possible Item to buy or exchange
-        super().__init__(name, price, doors, rarity, session, possible_items= possible_items, img_path= img_path)
+        super().__init__(
+            name,
+            price,
+            doors,
+            rarity,
+            session=Session,
+            possible_items=possible_items,
+            img_path=img_path
+        )
 
-    # To open the shop I think we need to do it in main
+        self.shop_items: list[ShopItem] = []
+
+    @abstractmethod
     def on_enter(self, player):
         return super().on_enter(player)
-
+    
+    @abstractmethod
     def on_draft(self, player):
         return super().on_draft(player)
-# Find how to implement
-class Commissary(YellowRoom):
-    """A general shop where the player may buy items with money.
-
-    Number of items and rarity depend on `player.luck`. Permanent items already
-    owned by the player are marked via `ShopItem.owned = True` so the UI can label them.
-    """
-    def __init__(self, name: str = "Commissary", price: int = 0, doors: list[Door] = None, rarity: Rarity = Rarity.STANDARD, img_path: str = 'rooms/Commissary.webp'):
-        doors = doors or [Door(LockState.LOCKED, Direction.BOTTOM)]
-        super().__init__(name, price, doors, rarity, possible_items=[], img_path=img_path)
-
-    def on_enter(self, player: Player):
-        # Build a deterministic dynamic shop inventory based on player.luck
-        # Use the room-provided RNG set by Map (`_room_random`) if available, otherwise fall back to session RNG
-        rnd = getattr(self, '_room_random', None) or getattr(self.session, 'random', None) or random.Random()
-
-        luck = max(0.0, getattr(player, 'luck', 1.0))
-        count = min(5, max(1, 1 + int(luck)))
-
-        candidates = [
-            (Shovel, 'Shovel', 10),
-            (MetalDetector, 'Metal Detector', 30),
-            (LockPick, 'Lock Pick', 20),
-            (Hammer, 'Hammer', 15),
-            (BunnyPaw, 'Bunny Paw', 25),
-        ]
-
-        pool = list(candidates)
-        offers = []
-        for _ in range(count):
-            if not pool:
-                break
-            idx = rnd.randrange(len(pool))
-            cls, label, base_price = pool.pop(idx)
-            price = max(1, int(base_price * (1 + (0.2 * (luck - 1)))))
-            item = cls(label, 1)
-            shop_item = ShopItem(item, price)
-            # Mark as owned if player already has it
-            for p in player.inventory.permanentItems:
-                if getattr(p, 'name', None) == label:
-                    shop_item.mark_owned(True)
-                    break
-            offers.append(shop_item)
-
-        # Consumable offer (Gems) influenced by luck
-        if rnd.random() < min(0.9, 0.25 + 0.15 * luck):
-            offers.append(ShopItem(ConsumableItem('Gems', 1 + int(luck), ConsumableType.GEM), 5 * max(1, int(luck))))
-
-        self.possible_item = offers[:5]
-        return super().on_enter(player)
-
+    
+    def shop(self, player: Player, choice: str) -> bool:
+        """Shop logic using shopitem"""
+        for item in self.shop_items:
+            if item.label == choice:
+                return item.buy(player)
+        return False
+    
+    def apply_effect(self, player):
+        pass
 
 class LaundryRoom(YellowRoom):
-    """Laundry Room: offers services (washing machines) that exchange resources.
+    def __init__(self, player):
+        name = "Laundry Room"
+        price = 1
+        doors = [Door(LockState.DOUBLE_LOCKED, Direction.BOTTOM)]
+        rarity = Rarity.RARE
+        sprite_path = "rooms/laundry_room.png"
+        possible_items = [
+                            (0.27, ConsumableItem, {'name': 'Gold', 'quantity': 1}),
+                            (0.25, ConsumableItem, {'name': 'Gold', 'quantity': 2}),
+                            (0.23, ConsumableItem, {'name': 'Gold', 'quantity': 3}),
+                            (0.20, ConsumableItem, {'name': 'Gold', 'quantity': 4}),
+                            (0.17, ConsumableItem, {'name': 'Gold', 'quantity': 5}),
+                            (0.15, ConsumableItem, {'name': 'Gold', 'quantity': 6}),
+                            (0.15, ConsumableItem, {'name': 'Key', 'quantity': 1})
+        ]   
+        super().__init__(
+            name,
+            price,
+            doors,
+            rarity,
+            possible_items=possible_items,
+            img_path=sprite_path
+        )
 
-    Services (each is a ShopItem with a price in money):
-    - Service A: Exchange ALL Gems with ALL Money at 1:1 for cost 5 money
-    - Service B: Exchange ALL Keys with ALL Gems at 1:1 for cost 5 money
-    - Service C: Exchange ALL Keys with ALL Gold at 1:1 for cost 10 money
-    """
-    def __init__(self, name: str = 'Laundry Room', price: int = 0, doors: list[Door] = None, rarity: Rarity = Rarity.RARE, img_path: str = 'rooms/Laundry_Room.png'):
-        doors = doors or [Door(LockState.DOUBLE_LOCKED, Direction.BOTTOM)]
-        super().__init__(name, price, doors, rarity, possible_items=[], img_path=img_path)
+    
+    def on_draft(self, player):
+        pass
+    
+    def on_enter(self, player):
+        self.shop_items = [
+            ShopItem(
+                label="Spin Cycle",
+                price=5,
+                effect=lambda p: p.inventory.swap_resources("Spin Cycle")
+            ),
+            ShopItem(
+                label="Wash & Dry",
+                price=5,
+                effect=lambda p: p.inventory.swap_resources("Wash & Dry")
+            ),
+            ShopItem(
+                label="Fluff & Fold",
+                price=10,
+                effect=lambda p: p.inventory.swap_resources("Fluff & Fold")
+            ),
+        ]
+    
+class Locksmith(YellowRoom):
+    def __init__(self):
+        name = "Locksmith"
+        price = 1
+        doors = [Door(LockState.UNLOCKED, Direction.BOTTOM)]
+        rarity = Rarity.UNUSUAL
+        sprite_path = "rooms/Locksmith.png"
+        possible_items = [
+                        (0.25, ConsumableItem, {'name': 'Gold', 'quantity': 2}),
+                        (0.20, ConsumableItem, {'name': 'Gold', 'quantity': 3}),
+                        (0.15, ConsumableItem, {'name': 'Gold', 'quantity': 5}),
+                        (0.2, ConsumableItem, {'name': 'Gem', 'quantity': 1}),
+                        (0.15, ConsumableItem, {'name': 'Key', 'quantity': 1})
+    ]
+        
+        super().__init__(
+            name,
+            price,
+            doors,
+            rarity,
+            possible_items=possible_items,
+            img_path=sprite_path
+        )
 
-    def on_enter(self, player: Player):
-        # Build three service ShopItems. The ShopItem.item will be a simple dict describing the service
-        services = []
 
-        # Service A: Gems <-> Money exchange (pay 5 money to perform)
-        services.append(ShopItem({'service': 'gems_to_money', 'desc': 'Exchange ALL Gems with ALL Money at 1:1'}, 5))
-
-        # Service B: Keys -> Gems (swap all keys into gems 1:1) cost 5 money
-        services.append(ShopItem({'service': 'keys_to_gems', 'desc': 'Exchange ALL Keys with ALL Gems at 1:1'}, 5))
-
-        # Service C: Keys -> Gold (swap all keys into money at 1:1) cost 10 money
-        services.append(ShopItem({'service': 'keys_to_money', 'desc': 'Exchange ALL Keys with ALL Gold at 1:1'}, 10))
-
-        self.possible_item = services
-        return super().on_enter(player)
-
-    def perform_service(self, player: Player, service_key: str) -> bool:
-        """Execute the specified service for the player.
-
-        Returns True if performed, False if insufficient funds or invalid.
-        """
-        inv = player.inventory
-        if service_key == 'gems_to_money':
-            cost = 5
-            if inv.money.quantity < cost:
-                return False
-            # pay cost
-            inv.spend_money(cost)
-            # Exchange all gems for money at 1:1 (add gems quantity to money and zero gems)
-            amount = inv.gems.quantity
-            inv.gems.quantity = 0
-            inv.money.quantity += amount
-            return True
-        if service_key == 'keys_to_gems':
-            cost = 5
-            if inv.money.quantity < cost:
-                return False
-            inv.spend_money(cost)
-            amount = inv.keys.quantity
-            inv.keys.quantity = 0
-            inv.gems.quantity += amount
-            return True
-        if service_key == 'keys_to_money':
-            cost = 10
-            if inv.money.quantity < cost:
-                return False
-            inv.spend_money(cost)
-            amount = inv.keys.quantity
-            inv.keys.quantity = 0
-            inv.money.quantity += amount
-            return True
-        return False
+    def on_draft(self, player):
+        pass
+    
+    def on_enter(self, player):
+        self.shop_items = [
+            ShopItem(
+                label="Key",
+                price=5,
+                effect=lambda p: p.inventory.add_keys(1)
+            ),
+            ShopItem(
+                label="Set of Keys",
+                price=12,
+                effect=lambda p: p.inventory.add_keys(3)
+            ),
+            ShopItem(
+                label="Lockpick",
+                price=10,
+                effect=self.__give_lockpick
+            ),
+        ]
+    
+    def __give_lockpick(self, player: Player):
+        """Effect only possible if player buys lockpick """
+        if not player.has_lock_pick: # Flase meaning he doesn't have one
+            player.has_lock_pick = True
