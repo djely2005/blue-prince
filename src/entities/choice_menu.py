@@ -17,21 +17,28 @@ class ChoiceMenu:
         # Ensure a default font exists (creates it lazily after pygame init)
         if self.font is None:
             try:
-                self.font = pygame.font.Font(None, 28)
+                self.font = pygame.font.Font(None, 22)
             except Exception:
                 # Fail-safe: use SysFont as fallback
-                self.font = pygame.font.SysFont(None, 28)
+                self.font = pygame.font.SysFont(None, 22)
         pygame.draw.rect(screen, (40, 40, 40), self.rect)
-        pygame.draw.rect(screen, (200, 200, 200), self.rect, 2)
+        pygame.draw.rect(screen, (200, 200, 200), self.rect, 3)
 
-        x = self.rect.x + 10
-        y = self.rect.y + 10
+        x = self.rect.x + 15
+        y = self.rect.y + 15
+        title = pygame.font.Font(None, 26).render("MENU", True, (255, 215, 0))
+        screen.blit(title, (x, y))
+        y += 35
 
         for i, (label, _) in enumerate(self.choices):
             color = (255, 255, 0) if i == self.selected_index else (200, 200, 200)
+            # Draw selection highlight
+            if i == self.selected_index:
+                highlight_rect = pygame.Rect(x - 10, y - 2, self.rect.width - 20, 28)
+                pygame.draw.rect(screen, (100, 100, 0), highlight_rect)
             text = self.font.render(label, True, color)
             screen.blit(text, (x, y))
-            y += 35
+            y += 32
 
     def handle_event(self, event, player):
         # Navigate menu
@@ -59,7 +66,7 @@ class ChoiceMenu:
 
 
 menu = ChoiceMenu(
-        rect=(MAP_WIDTH + 20, 240, TEXT_WIDTH - 40, 200),
+        rect=(MAP_WIDTH + 10, 150, INFO_WIDTH - 20, 500),
         font=None,
         choices=[]
     )

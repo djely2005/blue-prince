@@ -77,18 +77,35 @@ class Map:
             self.__update_selected_sprite(screen, player.grid_position, TILE_SIZE, player)
 
     def __update_selected_sprite(self, screen: pygame.Surface, pos: tuple[int, int], size: int, player: Player):
-        x, y = pos
+        """Draw the selection indicator showing which door the player is selecting."""
+        r, c = pos
         if player.selection_sprite:
-            scale_sprite = pygame.transform.scale(player.selection_sprite, (size, size))
-            x = OFFSET_X + x * TILE_SIZE
-            y = OFFSET_Y + y * TILE_SIZE
+            x = OFFSET_X + c * TILE_SIZE
+            y = OFFSET_Y + r * TILE_SIZE
+            # Scale the sprite to fit within the tile
+            scale_sprite = pygame.transform.scale(player.selection_sprite, (size // 2, size // 2))
+            
+            # Position the indicator at the edge of the tile based on direction
             if player.selected == Direction.TOP:
                 scale_sprite = pygame.transform.rotate(scale_sprite, -90)
-            if player.selected == Direction.BOTTOM:
+                indicator_x = x + size // 2 - size // 4
+                indicator_y = y - size // 4
+            elif player.selected == Direction.BOTTOM:
                 scale_sprite = pygame.transform.rotate(scale_sprite, 90)
-            if player.selected == Direction.RIGHT:
+                indicator_x = x + size // 2 - size // 4
+                indicator_y = y + size + size // 4 - size // 2
+            elif player.selected == Direction.RIGHT:
                 scale_sprite = pygame.transform.rotate(scale_sprite, 180)
-            screen.blit(scale_sprite, (x, y))
+                indicator_x = x + size + size // 4 - size // 2
+                indicator_y = y + size // 2 - size // 4
+            elif player.selected == Direction.LEFT:
+                scale_sprite = pygame.transform.rotate(scale_sprite, 0)
+                indicator_x = x - size // 4
+                indicator_y = y + size // 2 - size // 4
+            else:
+                return
+            
+            screen.blit(scale_sprite, (indicator_x, indicator_y))
 
     def draw(self, screen: pygame.Surface):
         """Draw the left-side map area."""
@@ -103,12 +120,13 @@ class Map:
                     room.draw(screen, (x, y), TILE_SIZE)
 
     def draw_player_position(self, screen: pygame.Surface, player: Player):
-        """Draw a small dot indicating the player's current position."""
+        """Draw a visual indicator of the player's current position."""
         r, c = player.grid_position
         x = OFFSET_X + c * TILE_SIZE + TILE_SIZE // 2
         y = OFFSET_Y + r * TILE_SIZE + TILE_SIZE // 2
-        # Draw a small red dot at the center of the room
-        pygame.draw.circle(screen, (255, 0, 0), (x, y), 5)
+        # Draw a larger circle indicator with a border for better visibility
+        pygame.draw.circle(screen, (255, 100, 100), (x, y), 8)
+        pygame.draw.circle(screen, (200, 0, 0), (x, y), 8, 2)
     
     def __is_room_accessible_by_door(self, position: tuple[int, int], direction: Direction) -> bool:
         # Safely check neighbouring room and whether it has a matching door
