@@ -122,10 +122,9 @@ def main():
 
         # --- Draw everything ---
         screen.fill(DARK_BLUE)
-        game_map.draw(screen)
+        game_map.draw(screen, session.player)
         game_map.update_selected_direction(session.player, screen)
-        game_map.draw_player_position(screen, session.player)
-        
+                
         # Draw HUD or room selector (pass current room into selector)
         current_room = game_map.grid[session.player.grid_position[0]][session.player.grid_position[1]]
         if room_selector.active:
