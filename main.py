@@ -86,7 +86,8 @@ def main():
                     if d.open_door(player):
                         room_choices = game_map.request_place_room(pos, direction, player)
                         room_selector.set_choices(room_choices)
-                menu.choices.append((f"Open Door - Cost {door.lock_state.value} keys", open_door_callback))
+                
+                if (not(game_map.check_if_room_exist_in_position(session.player, door.direction))): menu.choices.append((f"Open Door - Cost {door.lock_state.value} keys", open_door_callback))
 
         # Add options to move to adjacent visited rooms
         adjacent_visited = game_map.get_adjacent_visited_rooms(session.player.grid_position)

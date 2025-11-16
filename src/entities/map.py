@@ -104,8 +104,6 @@ class Map:
         # Draw a small red dot at the center of the room
         pygame.draw.circle(screen, (255, 0, 0), (x, y), 5)
     
-    def open_door(self):
-        pass
     def __is_room_accessible_by_door(self, position: tuple[int, int], direction: Direction) -> bool:
         # Safely check neighbouring room and whether it has a matching door
         r, c = position
@@ -523,13 +521,38 @@ class Map:
             # Check bounds
             if not (0 <= adj_r < GRID_HEIGHT and 0 <= adj_c < GRID_WIDTH):
                 continue
-
             adjacent_room = self.__grid[adj_r][adj_c]
             # Include the room if it exists and has been visited
-            if isinstance(adjacent_room, Room) and adjacent_room.visited:
+            if isinstance(adjacent_room, Room):
                 adjacent_visited[direction] = adjacent_room
         return adjacent_visited
 
+
+    def check_if_room_exist_in_position(self, player: Player, target_direction: Direction):
+        r, c = player.grid_position
+
+        # Calculate target position
+        if target_direction == Direction.TOP:
+            new_r, new_c = r - 1, c
+        elif target_direction == Direction.BOTTOM:
+            new_r, new_c = r + 1, c
+        elif target_direction == Direction.LEFT:
+            new_r, new_c = r, c - 1
+        elif target_direction == Direction.RIGHT:
+            new_r, new_c = r, c + 1
+        else:
+            return False
+
+        # Check bounds
+        if not (0 <= new_r < GRID_HEIGHT and 0 <= new_c < GRID_WIDTH):
+            return False
+
+        target_room = self.__grid[new_r][new_c]
+        
+        # Must be a visited room
+        if not isinstance(target_room, Room):
+            return False
+        return True
     def move_to_adjacent_room(self, player: Player, target_direction: Direction) -> bool:
         """
         Move the player to an adjacent visited room.
@@ -562,7 +585,7 @@ class Map:
         target_room = self.__grid[new_r][new_c]
         
         # Must be a visited room
-        if not isinstance(target_room, Room) or not target_room.visited:
+        if not isinstance(target_room, Room):
             return False
 
         # Move the player

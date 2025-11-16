@@ -10,7 +10,7 @@ from src.entities.other_item import OtherItem
 from src.entities.permanent_item import PermanentItem
 from src.entities.consumable_item import ConsumableItem
 from src.entities.player import Player
-import random
+from src.session import session
 
 # !!!!!! THIS need to be verified because I did it before you defined the classes needed
 # My structure : name_room: (probability, type, list[name, quantity])
@@ -34,17 +34,9 @@ possible_items = {
 }
 
 class VioletRoom(Room):
-    def __init__(self, name: str, price: int, doors: list[Door], rarity: Rarity, number_of_steps: int = 1, img_path: str = ''):
-        super().__init__(name, price, doors, rarity, possible_items=possible_items, image_path = img_path)
-        self.__number_of_steps = number_of_steps
-    
-    @property
-    def number_of_steps(self):
-        return self.__number_of_steps
-
-    @number_of_steps.setter
-    def number_of_steps(self, value: int):
-        self.__number_of_steps = value
+    def __init__(self, name: str, price: int, doors: list[Door], rarity: Rarity, number_of_steps: int = 1, img_path: str = '', possible_items = []):
+        super().__init__(name, price, doors, rarity, session, possible_items=possible_items, img_path = img_path)
+        self.number_of_steps = number_of_steps
 
     @abstractmethod
     def on_enter(self, player):
@@ -63,12 +55,12 @@ class VioletRoom(Room):
 
 
 class Bedroom(VioletRoom):
-    def __init__(self, player):
+    def __init__(self):
         name = "Bedroom"
         price = 0
         doors=[Door(LockState.UNLOCKED, Direction.BOTTOM), Door(LockState.UNLOCKED, Direction.LEFT)]
         rarity=Rarity.COMMON
-        sprite_path="rooms/bedroom.png"
+        sprite_path="rooms/Bedroom.webp"
         possible_items = [
                             (0.4, ConsumableItem, {'name': 'Gold', 'quantity': 3}),
                             (0.3, OtherItem, {'name': 'Apple', 'quantity': 1}),
@@ -77,24 +69,23 @@ class Bedroom(VioletRoom):
                             (0.15, ConsumableItem, {'name': 'Key', 'quantity': 1})
         ]
         super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path= sprite_path)
-    
     def on_draft(self, player):
         return super().on_draft(player)
 
     def on_enter(self, player: Player):
-        player.add_steps(self.number_of_steps)
+        player.add_steps(1)
 
     def shop(self, player, choice: str):
         return super().shop(player, choice)
 
 
 class Boudoir(VioletRoom):
-    def __init__(self, name: str, price: int, doors: list[Door], rarity: Rarity, map, player: Player):
+    def __init__(self):
         name = "Boudoir"
         price = 0
         doors=[Door(LockState.UNLOCKED, Direction.BOTTOM), Door(LockState.UNLOCKED, Direction.LEFT)]
         rarity=Rarity.STANDARD
-        sprite_path="rooms/boudoir.png"
+        sprite_path="rooms/Boudoir.webp"
         possible_items = [
                             (0.25, ConsumableItem, {'name': 'Gold', 'quantity': 2}),
                             (0.20, ConsumableItem, {'name': 'Gold', 'quantity': 3}),
@@ -102,11 +93,10 @@ class Boudoir(VioletRoom):
                             (0.2, ConsumableItem, {'name': 'Gem', 'quantity': 1}),
                             (0.15, ConsumableItem, {'name': 'Key', 'quantity': 1})
         ]
-        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path= sprite_path)
-        self.number_of_steps = map.luck_radint(1, 5, player)
-        
+        super().__init__(name, price, doors, rarity, number_of_steps=2,possible_items= possible_items, img_path= sprite_path)
     def on_enter(self, player: Player):
-        player.add_steps(self.number_of_steps)
+        if not(self.visited):
+            player.add_steps(2)
     
     def on_draft(self, player):
         return super().on_draft(player)
