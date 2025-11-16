@@ -84,11 +84,21 @@ class Map:
                 scale_sprite = pygame.transform.rotate(scale_sprite, 180)
             screen.blit(scale_sprite, (x, y))
 
-    def draw(self, screen: pygame.Surface):
-        """Draw the left-side map area."""
+    def draw(self, screen: pygame.Surface, player=None):
+        # fond bleu du côté gauche
         map_rect = pygame.Rect(0, 0, MAP_WIDTH, HEIGHT)
         pygame.draw.rect(screen, BLUE, map_rect)
 
+        # 1) Dessiner la grille (cases vides)
+        for r in range(GRID_HEIGHT):
+            for c in range(GRID_WIDTH):
+                x = OFFSET_X + c * TILE_SIZE
+                y = OFFSET_Y + r * TILE_SIZE
+                cell_rect = pygame.Rect(x, y, TILE_SIZE, TILE_SIZE)
+                pygame.draw.rect(screen, (30, 30, 60), cell_rect)
+                pygame.draw.rect(screen, (120, 120, 120), cell_rect, 1)
+
+        # 2) Dessiner les rooms existantes
         for row_idx, row in enumerate(self.grid):
             for col_idx, room in enumerate(row):
                 if isinstance(room, Room):
@@ -96,14 +106,15 @@ class Map:
                     y = OFFSET_Y + row_idx * TILE_SIZE
                     room.draw(screen, (x, y), TILE_SIZE)
 
-    def draw_player_position(self, screen: pygame.Surface, player: Player):
-        """Draw a small dot indicating the player's current position."""
-        r, c = player.grid_position
-        x = OFFSET_X + c * TILE_SIZE + TILE_SIZE // 2
-        y = OFFSET_Y + r * TILE_SIZE + TILE_SIZE // 2
-        # Draw a small red dot at the center of the room
-        pygame.draw.circle(screen, (255, 0, 0), (x, y), 5)
-    
+        # 3) Surligner la case du joueur en jaune
+        if player is not None:
+            r, c = player.grid_position
+            x = OFFSET_X + c * TILE_SIZE
+            y = OFFSET_Y + r * TILE_SIZE
+            highlight_rect = pygame.Rect(x, y, TILE_SIZE, TILE_SIZE)
+            pygame.draw.rect(screen, (255, 230, 50), highlight_rect, 3)
+
+
     def open_door(self):
         pass
     def __is_room_accessible_by_door(self, position: tuple[int, int], direction: Direction) -> bool:
