@@ -1,13 +1,9 @@
 from src.entities.blue_room import *
-from src.entities.yellow_room import YellowRoom
-from src.entities.violet_room import VioletRoom
-from src.entities.orange_room import OrangeRoom
-from src.entities.green_room import GreenRoom
-from src.entities.red_room import RedRoom
-from src.entities.door import Door
-from src.utils.direction import Direction
-from src.utils.lock_state import LockState
-from src.utils.rarity import Rarity
+from src.entities.yellow_room import LaundryRoom, Locksmith
+from src.entities.violet_room import Bedroom, Boudoir
+from src.entities.orange_room import Hallway, Passageway
+from src.entities.green_room import Veranda, Terrace
+from src.entities.red_room import Gymnasium, Lavatory
 
 entrance_hall = EntranceHall()
 
@@ -23,87 +19,27 @@ den = Den()
 
 pantry = Pantary()
 
-laundry_room = YellowRoom(
-    name="LaundryRoom",
-    price=1,
-    doors=[Door(LockState.UNLOCKED, Direction.BOTTOM)],
-    rarity=Rarity.RARE,
-    sprite_path="rooms/laundry_room.png"
-)
+laundry_room = LaundryRoom()
 
-Locksmith = YellowRoom(
-    name="Locksmith",
-    price=1,
-    doors=[Door(LockState.UNLOCKED, Direction.BOTTOM)],
-    rarity=Rarity.UNUSUAL,
-    sprite_path="rooms/Locksmith.png"
-)
+locksmith = Locksmith()
 
-bedroom = VioletRoom(
-    name="BedRoom", 
-    price=0, 
-    doors=[Door(LockState.UNLOCKED, Direction.BOTTOM), Door(LockState.UNLOCKED, Direction.LEFT)],
-    rarity=Rarity.COMMON,
-    sprite_path="rooms/bedroom.png"
-)
+bedroom = Bedroom()
 
-boudoir = VioletRoom(
-    name="Boudoir", 
-    price=0, 
-    doors=[Door(LockState.UNLOCKED, Direction.BOTTOM), Door(LockState.UNLOCKED, Direction.LEFT)],
-    rarity=Rarity.STANDARD,
-    sprite_path="rooms/boudoir.png"
-)
+boudoir = Boudoir()
 
-hallway = OrangeRoom(
-    name="Hallway", 
-    price=0, 
-    doors=[Door(LockState.UNLOCKED, Direction.BOTTOM), Door(LockState.UNLOCKED, Direction.LEFT), Door(LockState.UNLOCKED, Direction.RIGHT)],
-    rarity=Rarity.COMMON,
-    sprite_path="rooms/hellway.png"
-)
+hallway = Hallway()
 
-passageway = OrangeRoom(
-    name="Passageway", 
-    price=2, 
-    doors=[Door(LockState.UNLOCKED, Direction.BOTTOM), Door(LockState.UNLOCKED, Direction.TOP), Door(LockState.UNLOCKED, Direction.LEFT), Door(LockState.UNLOCKED, Direction.RIGHT)],
-    rarity=Rarity.COMMON,
-    sprite_path="rooms/passegeway.png"
-)
+passageway = Passageway()
 
-terrace = GreenRoom(
-    name="Terrace", 
-    price=0, 
-    doors=[Door(LockState.UNLOCKED, Direction.BOTTOM)],
-    rarity=Rarity.COMMON,
-    sprite_path="rooms/terrace.png"
-)
+terrace = Terrace()
 
-veranda = GreenRoom(
-    name="Veranda", 
-    price=2, 
-    doors=[Door(LockState.UNLOCKED, Direction.BOTTOM), Door(LockState.UNLOCKED, Direction.TOP)],
-    rarity=Rarity.UNUSUAL,
-    sprite_path="rooms/veranda.png"
-)
+veranda = Veranda()
 
-lavatory = RedRoom(
-    name="Lavatory", 
-    price=0, 
-    doors=[Door(LockState.UNLOCKED, Direction.BOTTOM)],
-    rarity=Rarity.COMMON,
-    sprite_path="rooms/lavatory.png"
-)
+lavatory = Lavatory()
 
-gymnasium = RedRoom(
-    name="Gymnasium", 
-    price=0, 
-    doors=[Door(LockState.UNLOCKED, Direction.BOTTOM), Door(LockState.UNLOCKED, Direction.RIGHT), Door(LockState.UNLOCKED, Direction.LEFT)],
-    rarity=Rarity.STANDARD,
-    sprite_path="rooms/gymasio.png"
-)
+gymnasium = Gymnasium()
 
-# Maybe I can use a deck for room picker not sure if I will keep it
+# Maybe I can use a deck for room picker 
 
 FULL_ROOM_DECK = [
     parlor,
@@ -112,7 +48,7 @@ FULL_ROOM_DECK = [
     den,
     pantry,
     laundry_room,
-    Locksmith,
+    locksmith,
     bedroom,
     boudoir,
     hallway,
