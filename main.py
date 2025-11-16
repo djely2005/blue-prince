@@ -6,6 +6,7 @@ from src.settings import *
 from src.entities.map import map
 from src.session import session
 from src.entities.choice_menu import menu
+from src.entities.door import Door
 
 
 # Change to a class HUD
@@ -48,6 +49,13 @@ def main():
         map.draw(screen)
         map.update_selected_direction(session.player, screen)
         draw_info_panel(screen)
+
+        menu.choices = []
+        if session.player.selected:
+            door = [e for e in map.grid[session.player.grid_position[0]][session.player.grid_position[1]].doors if e.direction == session.player.selected]
+            menu.choices.append(
+                (f"Open Door - Cost {door[0].lock_state.value} keys", map.open_door())
+            )
 
         # Draw the right menu
         menu.draw(screen)

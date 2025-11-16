@@ -44,7 +44,7 @@ menu = ChoiceMenu(
         rect=(MAP_WIDTH + 20, 240, TEXT_WIDTH - 40, 200),
         font=None,
         choices=[
-            ("Open door", lambda player: print("OPEN DOOR action >", player.grid_position)),
+            
             ("Check inventory", lambda player: print("MONEY >", player.inventory.money)),
             ("Wait", lambda player: print("You wait...")),
         ]

@@ -9,6 +9,7 @@ import random
 from src.entities.inventory import Inventory
 from src.utils.lock_state import LockState
 from src.entities.player import Player
+from src.entities.choice_menu import menu
 _DIRECTION_MAP = {
     # AZERTY
     pygame.K_z: Direction.TOP,
@@ -88,7 +89,9 @@ class Map:
                     x = OFFSET_X + col_idx * TILE_SIZE
                     y = OFFSET_Y + row_idx * TILE_SIZE
                     room.draw(screen, (x, y), TILE_SIZE)
-
+    
+    def open_door(self):
+        pass
     def __is_room_accessible_by_door(self, position: tuple[int, int], direction: Direction) -> bool:
         try:
             room: Room 
