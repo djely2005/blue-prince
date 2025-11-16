@@ -190,7 +190,7 @@ class Map:
                 break
         
         if not door_to_target:
-            return False 
+            return False
 
         return door_to_target.open_door(player)
 
@@ -670,6 +670,13 @@ class Map:
         player.grid_position = (new_r, new_c)
         target_room.on_enter(player)
         player.spend_steps(1)
+        try:
+            if getattr(target_room, 'name', '') == 'Antechamber':
+                self.game_over = True
+                self.game_over_message = 'You reached the Antechamber — You win!'
+                self.game_over_reason = 'win'
+        except Exception:
+            pass
         return True
 
 
