@@ -2,6 +2,7 @@
 
 import pygame
 import sys
+import random
 from src.settings import MAP_WIDTH, INFO_WIDTH, GRAY, DARK_BLUE, BLUE, WIDTH, HEIGHT, TILE_SIZE, OFFSET_X
 from src.entities.map import game_map
 from src.session import session
@@ -20,6 +21,19 @@ def draw_map_area(screen):
 
 
 def main():
+    # Ask for a seed before initializing pygame so the user can enter one or get a random seed
+    seed_input = input("Enter seed (leave empty for random): ").strip()
+    if seed_input == "":
+        seed = random.randint(0, 2**31 - 1)
+    else:
+        try:
+            seed = int(seed_input)
+        except Exception:
+            # allow non-numeric seeds by hashing
+            seed = abs(hash(seed_input)) % (2**31)
+
+    print(f"Using seed: {seed}")
+
     pygame.init()
     pygame.display.set_caption("Blue Prince - Prototype Display")
     clock = pygame.time.Clock()
@@ -31,6 +45,24 @@ def main():
     
     # Create room selector for when doors are opened
     room_selector = RoomSelector(rect=(MAP_WIDTH, 0, INFO_WIDTH, HEIGHT), font=FONT)
+
+    # Initialize/reset the global map with the chosen seed
+    try:
+        game_map.reset(seed)
+        game_map.seed = seed
+    except Exception:
+        # If reset is not available for some reason, ignore (map was initialized at import)
+        pass
+    # Ensure session and global random use the same seed for deterministic behavior
+    try:
+        from src import session as session_module
+        session_module.session.seed = seed
+        session_module.session.random = random.Random(seed)
+    except Exception:
+        # fallback: if session can't be updated, seed the global random module
+        pass
+    # Also seed the global random module so modules using module-level `random` are deterministic
+    random.seed(seed)
 
     while True:
         # Prepare menu choices each frame (shops take priority)
@@ -150,6 +182,12 @@ def main():
         game_map.draw(screen)
         game_map.update_selected_direction(session.player, screen)
         game_map.draw_player_position(screen, session.player)
+        # Draw seed on the HUD area
+        try:
+            seed_surf = FONT.render(f"Seed: {seed}", True, (0, 0, 0))
+            screen.blit(seed_surf, (MAP_WIDTH + 10, 8))
+        except Exception:
+            pass
         
         # Draw HUD or room selector (pass current room into selector)
         current_room = game_map.grid[session.player.grid_position[0]][session.player.grid_position[1]]
@@ -164,6 +202,25 @@ def main():
         # Draw the right menu (always draw unless in room selector mode)
         if not room_selector.active:
             menu.draw(screen)
+
+        # If the map signalled game over (Antechamber reached), show overlay and exit
+        if getattr(game_map, 'game_over', False):
+            overlay = pygame.Surface((WIDTH, HEIGHT))
+            overlay.set_alpha(200)
+            overlay.fill((0, 0, 0))
+            screen.blit(overlay, (0, 0))
+            big_font = pygame.font.Font(None, 64)
+            title = big_font.render("You Win!", True, (255, 215, 0))
+            title_rect = title.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 24))
+            screen.blit(title, title_rect)
+            msg_text = getattr(game_map, 'game_over_message', '') + f"  (Seed: {seed})"
+            msg = FONT.render(msg_text, True, (255, 255, 255))
+            msg_rect = msg.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 24))
+            screen.blit(msg, msg_rect)
+            pygame.display.flip()
+            pygame.time.wait(4000)
+            pygame.quit()
+            sys.exit()
 
         pygame.display.flip()
         clock.tick(60)

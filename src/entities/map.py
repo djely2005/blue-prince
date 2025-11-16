@@ -38,6 +38,9 @@ class Map:
         self.random = random.Random(seed)
         self.__pending_door = None  # Stores (position, direction) when door is opened
         self.__room_rotation = {}  # Tracks how many times each room is rotated
+        # Game state flags
+        self.game_over = False
+        self.game_over_message = ""
         
 
     @property
@@ -278,6 +281,24 @@ class Map:
         
         return selected
 
+    def reset(self, seed: int):
+        """Reset the map to a fresh state using `seed` for deterministic RNG.
+        This mirrors the initialization logic so callers can reuse the module-level
+        `game_map` instance without re-importing modules.
+        """
+        self.__seed = seed
+        self.__grid = [[None for _ in range(GRID_WIDTH)] for _ in range(GRID_HEIGHT)]
+        start_r = GRID_HEIGHT - 1
+        center_c = GRID_WIDTH // 2 + 1
+        # reuse templates from rooms module
+        self.__grid[start_r][center_c] = entrance_hall
+        self.__grid[0][center_c] = ante_chambre
+        self.random = random.Random(seed)
+        self.__pending_door = None
+        self.__room_rotation = {}
+        self.game_over = False
+        self.game_over_message = ""
+
     def handle_room_selection(self, selected_room: Room, player: Player) -> bool:
         """
         Place the selected room on the map and move the player into it.
@@ -410,6 +431,14 @@ class Map:
             pass
 
         new_room.on_enter(player)
+
+        # If this room is the Antechamber, the player wins the game
+        try:
+            if getattr(new_room, 'name', '') == 'Antechamber':
+                self.game_over = True
+                self.game_over_message = 'You reached the Antechamber — You win!'
+        except Exception:
+            pass
 
         # Synchronize adjacent room doors
         self._synchronize_adjacent_doors(new_r, new_c)
