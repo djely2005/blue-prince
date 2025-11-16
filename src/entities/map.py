@@ -325,6 +325,47 @@ class Map:
         for _ in range(rotations):
             self._rotate_room_doors(new_room)
 
+        # Record visual rotation on the room so its sprite is drawn in the same orientation
+        prev_rot = getattr(new_room, '_Room__rotation', 0)
+        new_room._Room__rotation = (prev_rot + rotations) % 4
+
+        # Determine lock states for the placed room's doors according to rules:
+        # - Entrance level (level 0) and level 1 (row above entrance) => UNLOCKED
+        # - Antechamber (topmost level) => DOUBLE_LOCKED
+        # - Other rooms: random, influenced by player.luck and the level
+        max_level = GRID_HEIGHT - 1
+        # level 0 corresponds to the entrance row (bottom). Compute level from new_r.
+        level = (GRID_HEIGHT - 1) - new_r
+
+        for door in new_room.doors:
+            # Entrance and adjacent rows unlocked
+            if level in (0, 1):
+                door.lock_state = LockState.UNLOCKED
+                continue
+
+            # Antechamber (topmost level) double locked
+            if level == max_level:
+                door.lock_state = LockState.DOUBLE_LOCKED
+                continue
+
+            # For other levels, determine probabilities based on level and player luck.
+            # Higher level -> higher chance of stronger locks. Higher luck -> lower chance.
+            rng = self.random.random()
+            # base factors
+            level_factor = level / max_level  # 0..1
+            luck_factor = max(1.0, getattr(player, 'luck', 1.0))
+
+            # compute thresholds (clamped)
+            double_thresh = min(0.85, (0.35 + 0.45 * level_factor) / luck_factor)
+            locked_thresh = min(0.95, double_thresh + (0.25 + 0.35 * level_factor) / luck_factor)
+
+            if rng < double_thresh:
+                door.lock_state = LockState.DOUBLE_LOCKED
+            elif rng < locked_thresh:
+                door.lock_state = LockState.LOCKED
+            else:
+                door.lock_state = LockState.UNLOCKED
+
         # Check if player can afford the room
         if new_room.price > player.inventory.gems.quantity:
             return False
