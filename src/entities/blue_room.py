@@ -98,6 +98,9 @@ class Nook(BlueRoom):
     def on_draft(self, player):
         return super().on_draft(player)
     
+    def shop(self, player, choice):
+        return super().shop(player, choice)
+    
 
 class Den(BlueRoom):
     def __init__(self):

@@ -567,6 +567,7 @@ class Map:
 
         # Move the player
         player.grid_position = (new_r, new_c)
+        player.spend_steps(1)
         return True
 
 

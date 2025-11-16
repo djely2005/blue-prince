@@ -81,11 +81,6 @@ class Room(ABC):
         """Applies the room's special effect when the player drafts."""
         pass
 
-    @abstractmethod
-    def shop(self, player, choice: str):
-        """To create the logic of the yellow rooms"""
-        pass
-
     def __repr__(self):
         return f"<{self.name} (Cost={self.price})>"
     
