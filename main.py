@@ -109,7 +109,7 @@ def main():
                 menu.choices.append((label, make_buy_callback(shop_item, current_room)))
             shop_active = True
 
-        # If not in a shop, populate door and movement choices now so they are available during event handling
+        # Door opening and room navigation available regardless of shop status
         if session.player.selected and not room_selector.active:
             doors = [e for e in game_map.grid[session.player.grid_position[0]][session.player.grid_position[1]].doors if e.direction == session.player.selected]
             if doors:
@@ -120,6 +120,12 @@ def main():
                         room_selector.set_choices(room_choices)
                 
                 if (not(game_map.check_if_room_exist_in_position(session.player, door.direction))): menu.choices.append((f"Open Door - Cost {door.lock_state.value} keys", open_door_callback))
+
+        # Add options to move to adjacent visited rooms (always available)
+        adjacent_visited = game_map.get_adjacent_visited_rooms(session.player.grid_position)
+        for direction, room in adjacent_visited.items():
+            direction_name = direction.name.capitalize()
+            menu.choices.append((f"Go {direction_name} ({room.name})", lambda player, d=direction: game_map.move_to_adjacent_room(player, d)))
 
         # If current room has an event, show an interact option
         if not room_selector.active:
@@ -144,12 +150,6 @@ def main():
                     return cb
 
                 menu.choices.append((f"Interact: {evt.name}", make_event_cb(evt)))
-
-        # Add options to move to adjacent visited rooms
-        adjacent_visited = game_map.get_adjacent_visited_rooms(session.player.grid_position)
-        for direction, room in adjacent_visited.items():
-            direction_name = direction.name.capitalize()
-            menu.choices.append((f"Go {direction_name} ({room.name})", lambda player, d=direction: game_map.move_to_adjacent_room(player, d)))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

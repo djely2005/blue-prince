@@ -38,10 +38,10 @@ class Commissary(YellowRoom):
     owned by the player are marked via `ShopItem.owned = True` so the UI can label them.
     """
     def __init__(self, name: str = "Commissary", price: int = 0, doors: list[Door] = None, rarity: Rarity = Rarity.STANDARD, img_path: str = 'rooms/Commissary.webp'):
-        doors = doors or [Door(LockState.LOCKED, Direction.BOTTOM)]
+        doors = doors or [Door(LockState.LOCKED, Direction.BOTTOM), Door(LockState.LOCKED, Direction.LEFT)]
         super().__init__(name, price, doors, rarity, possible_items=[], img_path=img_path)
 
-    def on_enter(self, player: Player):
+    def on_draft(self, player: Player):
         # Build a deterministic dynamic shop inventory based on player.luck
         # Use the room-provided RNG set by Map (`_room_random`) if available, otherwise fall back to session RNG
         rnd = getattr(self, '_room_random', None) or getattr(self.session, 'random', None) or random.Random()
@@ -94,7 +94,7 @@ class LaundryRoom(YellowRoom):
         doors = doors or [Door(LockState.DOUBLE_LOCKED, Direction.BOTTOM)]
         super().__init__(name, price, doors, rarity, possible_items=[], img_path=img_path)
 
-    def on_enter(self, player: Player):
+    def on_draft(self, player: Player):
         # Build three service ShopItems. The ShopItem.item will be a simple dict describing the service
         services = []
 
