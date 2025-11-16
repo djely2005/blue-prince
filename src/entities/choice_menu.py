@@ -41,7 +41,7 @@ class ChoiceMenu:
         y += 35
 
         # ---- Consumables / Items available in current room ----
-        if len(current_room.available_items):
+        if hasattr(current_room, 'available_items') and len(current_room.available_items):
             y += 8
             other_title = self.font.render("CONSUMABLES:", True, DARK_BLUE)
             screen.blit(other_title, (x, y))

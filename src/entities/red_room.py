@@ -51,8 +51,7 @@ class RedRoom(Room):
                     self.available_items.append(item)
                 else:
                     # PermanentItem or OtherItem: add accordingly
-                    if hasattr(player.inventory, 'otherItems'):
-                        self.available_items.append(item)
+                    self.available_items.append(item)
 
 
 class Chapel(RedRoom):
