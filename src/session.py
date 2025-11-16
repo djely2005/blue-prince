@@ -8,16 +8,15 @@ class Session():
         self.__seed = seed
         self.player = player
         self.random = random.Random(seed)
-
     @property
-    def seed(self, seed):
-        self.__seed = seed
+    def seed(self):
+        return self.__seed
 
     @seed.setter
-    def seed(self):
-        return self.__seed 
-    
-    def luck_radint(self, min_val, max_val):
+    def seed(self, value):
+        self.__seed = value
+
+    def luck_randint(self, min_val, max_val):
         r = self.random.random()
         bias = 1 / (1 + self.player.luck)
         biased = r ** bias

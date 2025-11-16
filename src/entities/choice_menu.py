@@ -10,10 +10,17 @@ class ChoiceMenu:
         self.font = font
         self.choices = choices
         self.selected_index = 0
-
-        self.font = pygame.font.SysFont(None, 28)
+        # Do not create fonts at import time; if `font` is None, defer
+        # creating a default font until draw time (after pygame.init()).
 
     def draw(self, screen):
+        # Ensure a default font exists (creates it lazily after pygame init)
+        if self.font is None:
+            try:
+                self.font = pygame.font.Font(None, 28)
+            except Exception:
+                # Fail-safe: use SysFont as fallback
+                self.font = pygame.font.SysFont(None, 28)
         pygame.draw.rect(screen, (40, 40, 40), self.rect)
         pygame.draw.rect(screen, (200, 200, 200), self.rect, 2)
 
@@ -44,8 +51,5 @@ menu = ChoiceMenu(
         rect=(MAP_WIDTH + 20, 240, TEXT_WIDTH - 40, 200),
         font=None,
         choices=[
-            
-            ("Check inventory", lambda player: print("MONEY >", player.inventory.money)),
-            ("Wait", lambda player: print("You wait...")),
         ]
     )

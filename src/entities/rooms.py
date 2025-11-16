@@ -10,6 +10,7 @@ from src.utils.lock_state import LockState
 from src.utils.rarity import Rarity
 
 entrance_hall = EntranceHall()
+entrance_hall.visited = True
 
 ante_chambre = Antechamber()
 
@@ -21,7 +22,7 @@ nook = Nook()
 
 den = Den()
 
-pantry = Pantary()
+pantry = Pantry()
 
 
 FULL_ROOM_DECK = [

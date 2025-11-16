@@ -23,20 +23,31 @@ class Door :
 
 
     # Iam not sure if this method should be added here ?
-    def open_door(self, player: Inventory) -> bool:
-        """Open the door with the keys of the player's inventory"""  
+    def open_door(self, player) -> bool:
+        """Attempt to open the door using the provided player's inventory.
+
+        `player` is expected to have an `inventory` attribute exposing
+        `spend_keys(n: int) -> bool`.
+        """
+        inv = getattr(player, "inventory", None)
+        if inv is None:
+            return False
+
         if self.__lock_state == LockState.UNLOCKED:
             return True
-            
-        elif self.__lock_state == LockState.LOCKED:
-            if player.can_open_level1_for_free():
-                return True
-            return player.try_spend_key()
-            
-        elif self.__lock_state == LockState.DOUBLE_LOCKED:
-            player.try_spend_key()
-            return player.try_spend_key() # 2 keys
-            
+
+        if self.__lock_state == LockState.LOCKED:
+            # spend a single key
+            return inv.spend_keys(1)
+
+        if self.__lock_state == LockState.DOUBLE_LOCKED:
+            # need two keys
+            ok1 = inv.spend_keys(1)
+            if not ok1:
+                return False
+            ok2 = inv.spend_keys(1)
+            return ok2
+
         return False
 
     

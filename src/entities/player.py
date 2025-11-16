@@ -2,7 +2,6 @@
 from typing import Tuple
 from src.entities.inventory import Inventory
 from src.utils.direction import Direction
-from src.settings import *
 import pygame
 # keep long/explicit names
 _DIRECTION_MAP = {
@@ -23,7 +22,15 @@ class Player:
         self.__inventory: Inventory = inventory
         self.selected: Direction = None
         self.__luck: float = 1.0
-        self.selection_sprite = pygame.image.load('player.png')
+        # Load sprite if available; don't crash if resource missing.
+        try:
+            # Prefer package-relative path; fallback to simple filename.
+            self.selection_sprite = pygame.image.load('src/assets/player.png')
+        except Exception:
+            try:
+                self.selection_sprite = pygame.image.load('player.png')
+            except Exception:
+                self.selection_sprite = None
 
     @property
     def luck(self):

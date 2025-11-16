@@ -2,24 +2,13 @@
 
 import pygame
 import sys
-from src.settings import *
-from src.entities.map import map
+from src.settings import MAP_WIDTH, INFO_WIDTH, GRAY, DARK_BLUE, BLUE, WIDTH, HEIGHT, TILE_SIZE, OFFSET_X
+from src.entities.map import game_map
 from src.session import session
 from src.entities.choice_menu import menu
 from src.entities.door import Door
-
-
-# Change to a class HUD
-def draw_info_panel(screen):
-    """Draw the right-side text/info panel."""
-    info_rect = pygame.Rect(MAP_WIDTH, 0, INFO_WIDTH, HEIGHT)
-    pygame.draw.rect(screen, GRAY, info_rect)
-
-    y_offset = 50
-    for line in INFO_LINES:
-        text_surface = FONT.render(line, True, DARK_BLUE)
-        screen.blit(text_surface, (MAP_WIDTH + 20, y_offset))
-        y_offset += 40
+from src.ui.hud import HUD
+from src.ui.room_selector import RoomSelector
 
 
 # Change to put Map class
@@ -33,7 +22,14 @@ def main():
     pygame.init()
     pygame.display.set_caption("Blue Prince - Prototype Display")
     clock = pygame.time.Clock()
-
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    FONT = pygame.font.Font(None, 28)
+    
+    # Create HUD for displaying inventory
+    hud = HUD(rect=(MAP_WIDTH, 0, INFO_WIDTH, HEIGHT), font=FONT)
+    
+    # Create room selector for when doors are opened
+    room_selector = RoomSelector(rect=(MAP_WIDTH, 0, INFO_WIDTH, HEIGHT), font=FONT)
 
     while True:
         for event in pygame.event.get():
@@ -41,24 +37,59 @@ def main():
                 pygame.quit()
                 sys.exit()
 
+            # Handle room selector first if active
+            if room_selector.active:
+                selected_room = room_selector.handle_event(event)
+                if selected_room:
+                    game_map.handle_room_selection(selected_room, session.player)
+                continue
+
             # MENU INPUT HANDLING
             menu.handle_event(event, session.player)
 
         # --- Draw everything ---
         screen.fill(DARK_BLUE)
-        map.draw(screen)
-        map.update_selected_direction(session.player, screen)
-        draw_info_panel(screen)
+        game_map.draw(screen)
+        game_map.update_selected_direction(session.player, screen)
+        game_map.draw_player_position(screen, session.player)
+        
+        # Draw HUD or room selector
+        if room_selector.active:
+            room_selector.draw(screen)
+        else:
+            hud.draw(screen, session.player)
 
         menu.choices = []
-        if session.player.selected:
-            door = [e for e in map.grid[session.player.grid_position[0]][session.player.grid_position[1]].doors if e.direction == session.player.selected]
+        if session.player.selected and not room_selector.active:
+            doors = [e for e in game_map.grid[session.player.grid_position[0]][session.player.grid_position[1]].doors if e.direction == session.player.selected]
+            if doors:
+                door = doors[0]
+                # Create callback that opens door and shows room selector
+                def open_door_callback(player, d=door, pos=session.player.grid_position, direction=session.player.selected):
+                    if d.open_door(player):
+                        # Door opened successfully, show room selector
+                        room_choices = game_map.request_place_room(pos, direction)
+                        room_selector.set_choices(room_choices)
+                    else:
+                        # Not enough keys
+                        pass
+                
+                menu.choices.append(
+                    (f"Open Door - Cost {door.lock_state.value} keys", open_door_callback)
+                )
+        
+        # Add options to move to adjacent visited rooms
+        adjacent_visited = game_map.get_adjacent_visited_rooms(session.player.grid_position)
+        for direction, room in adjacent_visited.items():
+            direction_name = direction.name.capitalize()
+            menu.choices = []
             menu.choices.append(
-                (f"Open Door - Cost {door[0].lock_state.value} keys", map.open_door())
+                (f"Go {direction_name} ({room.name})", lambda player, d=direction: game_map.move_to_adjacent_room(player, d))
             )
 
-        # Draw the right menu
-        menu.draw(screen)
+        # Draw the right menu (always draw unless in room selector mode)
+        if not room_selector.active:
+            menu.draw(screen)
 
         pygame.display.flip()
         clock.tick(60)

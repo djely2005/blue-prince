@@ -7,8 +7,8 @@ WIDTH, HEIGHT = 800, 600
 MAP_RATIO = 0.6
 MAP_WIDTH = int(WIDTH * MAP_RATIO)
 INFO_WIDTH = WIDTH - MAP_WIDTH
-GRID_HEIGHT = 3 # 9
-GRID_WIDTH = 3 # 5
+GRID_HEIGHT = 9
+GRID_WIDTH = 5
 TILE_SIZE = 64
 OFFSET_X = 20
 OFFSET_Y = 20
@@ -21,8 +21,8 @@ WHITE = (255, 255, 255)
 GRAY = (200, 200, 200)
 
 # --- Fonts ---
-pygame.font.init()
-FONT = pygame.font.Font(None, 28)
+# Note: do NOT initialize fonts or create a display surface at import time.
+# Initialize pygame and create `FONT` and `screen` inside `main()` instead.
 
 # --- Text content ---
 INFO_LINES = [
@@ -33,4 +33,4 @@ INFO_LINES = [
     "3. Check your inventory"
 ]
 
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
+# screen should be created in the entrypoint after pygame.init()

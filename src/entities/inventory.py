@@ -7,13 +7,13 @@ from src.utils.consumable_type import ConsumableType
 class Inventory:
     def __init__(self):
         """Explicit names preferred. Counts start as per spec; adjust if design changes."""
-        self.permanentItems: PermanentItem = []
+        self.permanentItems: list[PermanentItem] = []
         self.steps: ConsumableItem = ConsumableItem('Steps', 70, ConsumableType.STEP)
         self.money: ConsumableItem = ConsumableItem('Money', 0, ConsumableType.MONEY)
         self.gems: ConsumableItem = ConsumableItem('Gems', 0, ConsumableType.GEM)
         self.keys: ConsumableItem = ConsumableItem('keys', 0, ConsumableType.KEY)
         self.dice: ConsumableItem = ConsumableItem('Dice', 0, ConsumableType.DICE)
-        pass
+        # Keep constructor minimal; avoid side-effects here.
     # Needs to be private
 
 
@@ -21,7 +21,7 @@ class Inventory:
     # We use clear verbs and explicit intent.
     def spend_steps(self, n: int) -> None:
         """Lose n steps. If steps reach 0, game over logic is handled by the scene/game loop."""
-        self.steps.quantity = self.steps.quantity - n
+        self.steps.quantity = max(0, self.steps.quantity - n)
         # Game should be over if negative
 
     def add_steps(self, n: int) -> None:
@@ -34,17 +34,17 @@ class Inventory:
             self.gems.quantity -= n
             return True
         return False
-    def add_gems(self, n: int) -> bool:
+    def add_gems(self, n: int) -> None:
         self.gems.quantity += n
 
-    def spend_keys(self) -> bool:
-        """Consume a key if available."""
-        if self.keys.quantity >= 0:
-            self.keys.quantity -= 1
+    def spend_keys(self, n: int = 1) -> bool:
+        """Consume `n` keys if available. Return True if spent, False otherwise."""
+        if self.keys.quantity >= n:
+            self.keys.quantity -= n
             return True
         return False
 
-    def add_keys(self, n: int) -> bool:
+    def add_keys(self, n: int) -> None:
         self.keys.quantity += n
 
 
@@ -61,23 +61,18 @@ class Inventory:
     # The purpose of LaundryRoom is trading money, keys or gems
     # This method shouldn't be here
     def swap_gem_money(self, choice: str):
-        player_money = self.money
-        player_gems = self.gems
-        player_key = self.keys
+        # Swap quantities in a controlled way rather than swapping objects.
         if choice == "SpinCycle":
-            self.money = player_gems
-            self.gems = player_money
-        if choice == "washDry" :
-            self.gems = player_key
-            self.keys = player_gems
-        if choice == "FliffFold":
-            self.money = player_key
-            self.keys = player_money
+            self.money.quantity, self.gems.quantity = self.gems.quantity, self.money.quantity
+        elif choice == "washDry":
+            # exchange gems for keys (example behaviour)
+            self.gems.quantity, self.keys.quantity = self.keys.quantity, self.gems.quantity
+        elif choice == "FliffFold":
+            self.money.quantity, self.keys.quantity = self.keys.quantity, self.money.quantity
 
 
 
     def has_any_permanent_tools(self) -> bool:
-        return any([
-            self._has_shovel, self._has_hammer, self._has_lock_pick,
-            self._has_metal_detector, self._has_bunny_paw
-        ])
+        # Return True if any permanent items exist. Specific queries
+        # (has_shovel, etc.) should be added if needed.
+        return len(self.permanentItems) > 0
