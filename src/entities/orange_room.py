@@ -59,9 +59,9 @@ class OrangeRoom(Room):
 
 class Hallway(OrangeRoom):
     def __init__(self):
-        name="Hallway", 
-        price=0, 
-        doors=[Door(LockState.UNLOCKED, Direction.BOTTOM), Door(LockState.UNLOCKED, Direction.LEFT), Door(LockState.UNLOCKED, Direction.RIGHT)],
+        name="Hallway" 
+        price=0
+        doors=[Door(LockState.UNLOCKED, Direction.BOTTOM), Door(LockState.UNLOCKED, Direction.LEFT), Door(LockState.UNLOCKED, Direction.RIGHT)]
         rarity=Rarity.COMMON
         sprite_path = "rooms/Hallway.png"
         possible_items =[
@@ -85,7 +85,7 @@ class Hallway(OrangeRoom):
 
 class Passageway(OrangeRoom):
     def __init__(self):
-        name="Passageway", 
+        name="Passageway"
         price=2
         doors=[Door(LockState.UNLOCKED, Direction.BOTTOM), Door(LockState.UNLOCKED, Direction.TOP), Door(LockState.UNLOCKED, Direction.LEFT), Door(LockState.UNLOCKED, Direction.RIGHT)]
         rarity=Rarity.COMMON
