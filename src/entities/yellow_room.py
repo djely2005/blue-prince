@@ -107,7 +107,7 @@ class LaundryRoom(YellowRoom):
         # Service C: Keys -> Gold (swap all keys into money at 1:1) cost 10 money
         services.append(ShopItem({'service': 'keys_to_money', 'desc': 'Exchange ALL Keys with ALL Gold at 1:1'}, 10))
 
-        self.possible_item = services
+        self.possible_items = services
         return super().on_enter(player)
 
     def perform_service(self, player: Player, service_key: str) -> bool:
