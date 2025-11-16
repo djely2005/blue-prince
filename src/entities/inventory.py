@@ -9,8 +9,8 @@ class Inventory:
     def __init__(self):
         """Explicit names preferred. Counts start as per spec; adjust if design changes."""
         self.permanentItems: list[PermanentItem] = [
+            LockPick()
         ]
-        self.otherItems: list = []  # Consumable items found in rooms
         self.steps: ConsumableItem = ConsumableItem('Steps', 70, ConsumableType.STEP)
         self.money: ConsumableItem = ConsumableItem('Money', 50, ConsumableType.MONEY)
         self.gems: ConsumableItem = ConsumableItem('Gems', 30, ConsumableType.GEM)

@@ -69,8 +69,8 @@ def main():
         menu.choices = []
         shop_active = False
         current_room = game_map.grid[session.player.grid_position[0]][session.player.grid_position[1]]
-        if isinstance(current_room, YellowRoom) and getattr(current_room, 'possible_item', None):
-            shop_items = current_room.possible_item
+        if isinstance(current_room, YellowRoom) and getattr(current_room, 'possible_items', None):
+            shop_items = current_room.possible_items
             for shop_item in shop_items:
                 if isinstance(shop_item.item, dict):
                     desc = shop_item.item.get('desc', shop_item.item.get('service', 'Service'))

@@ -57,7 +57,7 @@ class Commissary(YellowRoom):
         count = min(5, max(1, 1 + int(luck)))
 
 
-        pool = list(self.possible_item)
+        pool = list(self.possible_items)
         offers = []
         for _ in range(count):
             if not pool:
@@ -78,7 +78,7 @@ class Commissary(YellowRoom):
         if rnd.random() < min(0.9, 0.25 + 0.15 * luck):
             offers.append(ShopItem(ConsumableItem('Gems', 1 + int(luck), ConsumableType.GEM), 5 * max(1, int(luck))))
 
-        self.possible_item = offers[:5]
+        self.possible_items = offers[:5]
         return super().on_enter(player)
 
 

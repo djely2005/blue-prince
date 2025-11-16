@@ -22,7 +22,7 @@ class Player:
         self.grid_position: Tuple[int, int] = grid_position
         self.__inventory: Inventory = inventory
         self.selected: Direction = None
-        self.__luck: float = 100000000000000.0
+        self.__luck: float = 1.0
         # Load sprite if available; don't crash if resource missing.
         try:
             # Prefer package-relative path; fallback to simple filename.
