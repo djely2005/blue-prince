@@ -1,5 +1,9 @@
 from src.entities.room import Room
 from src.entities.blue_room import BlueRoom
+from src.entities.green_room import GreenRoom
+from src.entities.pit import Pit
+from src.entities.locker import Locker
+from src.entities.chest import Chest
 from src.entities.door import Door
 from src.utils.direction import Direction
 import pygame
@@ -380,6 +384,31 @@ class Map:
         # Trigger on_enter effect
         # Provide the map's seeded RNG to the room so room effects (shops) can be deterministic
         setattr(new_room, '_room_random', self.random)
+        # Attach an event to the room automatically depending on its type.
+        # Use the map's seeded RNG so event placement is deterministic.
+        try:
+            rnd = self.random
+            # Green rooms -> Pit; Blue rooms -> Locker; Others -> Chest (lower chance)
+            if isinstance(selected_room, GreenRoom):
+                if rnd.random() < 0.35:
+                    evt = Pit()
+                    setattr(evt, '_room_random', rnd)
+                    new_room.event = evt
+            elif isinstance(selected_room, BlueRoom):
+                if rnd.random() < 0.35:
+                    evt = Locker()
+                    setattr(evt, '_room_random', rnd)
+                    new_room.event = evt
+            else:
+                # Other rooms (red/orange/etc) get chests less frequently
+                if rnd.random() < 0.25:
+                    evt = Chest()
+                    setattr(evt, '_room_random', rnd)
+                    new_room.event = evt
+        except Exception:
+            # non-fatal: if event classes aren't available, skip event spawning
+            pass
+
         new_room.on_enter(player)
 
         # Synchronize adjacent room doors

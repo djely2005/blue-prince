@@ -89,6 +89,31 @@ def main():
                 
                 if (not(game_map.check_if_room_exist_in_position(session.player, door.direction))): menu.choices.append((f"Open Door - Cost {door.lock_state.value} keys", open_door_callback))
 
+        # If current room has an event, show an interact option
+        if not room_selector.active:
+            current_room = game_map.grid[session.player.grid_position[0]][session.player.grid_position[1]]
+            evt = getattr(current_room, 'event', None)
+            if evt is not None and not getattr(evt, 'opened', False):
+                # Add menu choice to interact/open the event
+                def make_event_cb(e):
+                    def cb(player):
+                        try:
+                            res = e.open(player)
+                        except Exception as exc:
+                            hud.show_message(f"Error: {exc}", 3.0)
+                            return
+                        # Expect (success: bool, message: str, reward: dict)
+                        if isinstance(res, tuple) and len(res) >= 2:
+                            success, msg = res[0], res[1]
+                        else:
+                            success, msg = False, 'Nothing happened'
+
+                        hud.show_message(msg, 3.0)
+
+                    return cb
+
+                menu.choices.append((f"Interact: {evt.name}", make_event_cb(evt)))
+
         # Add options to move to adjacent visited rooms
         adjacent_visited = game_map.get_adjacent_visited_rooms(session.player.grid_position)
         for direction, room in adjacent_visited.items():

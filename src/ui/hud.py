@@ -17,6 +17,9 @@ class HUD:
         self.font = font
         self.line_height = 30
         self.padding = 10
+        # Transient message state
+        self._message = None
+        self._message_expire = 0.0
 
     def draw(self, screen: pygame.Surface, player):
         """Draw the HUD panel with player inventory and stats."""
@@ -65,3 +68,18 @@ class HUD:
                 item_text = self.font.render(f"- {item.name}", True, (0, 0, 0))
                 screen.blit(item_text, (x + 10, y))
                 y += self.line_height
+
+            # Draw transient message if present
+            if self._message and pygame.time.get_ticks() / 1000.0 < self._message_expire:
+                # Render message at bottom of HUD
+                msg_surf = self.font.render(self._message, True, (255, 255, 255))
+                msg_bg = pygame.Rect(self.rect.x + self.padding, self.rect.bottom - self.line_height - self.padding, self.rect.width - self.padding * 2, self.line_height + 4)
+                pygame.draw.rect(screen, DARK_BLUE, msg_bg)
+                screen.blit(msg_surf, (msg_bg.x + 4, msg_bg.y + 2))
+            else:
+                self._message = None
+
+        def show_message(self, text: str, duration: float = 3.0):
+            """Show a transient message on the HUD for `duration` seconds."""
+            self._message = str(text)
+            self._message_expire = pygame.time.get_ticks() / 1000.0 + float(duration)

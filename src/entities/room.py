@@ -23,6 +23,8 @@ class Room(ABC):
         # rotation in 90-degree clockwise steps (0..3). This value is updated by Map when the room is rotated.
         self.__rotation = 0
         self.__visited = False
+        # Optional event that may be attached to a room (Pit, Locker, Chest, ...)
+        self.__event = None
     # Maybe we gonna add more methods like post_effect or draft_effect
     
     @property
@@ -172,3 +174,11 @@ class Room(ABC):
                 new_item = item_class(**init_args)
                 self.__available_items.append(new_item)
                 break
+
+    @property
+    def event(self):
+        return self.__event
+
+    @event.setter
+    def event(self, value):
+        self.__event = value
