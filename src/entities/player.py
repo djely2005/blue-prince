@@ -3,18 +3,17 @@ from typing import Tuple
 from src.entities.inventory import Inventory
 from src.utils.direction import Direction
 import pygame
-
 # keep long/explicit names
-_DIRECTION_DELTAS = {
-    "Z": (-1, 0),  # up  (AZERTY)
-    "Q": (0, -1),  # left
-    "S": (1,  0),  # down
-    "D": (0,  1),  # right
-    # also allow arrows for convenience
-    "UP":    (-1, 0),
-    "LEFT":  (0, -1),
-    "DOWN":  (1, 0),
-    "RIGHT": (0, 1),
+_DIRECTION_MAP = {
+    # AZERTY
+    pygame.K_z: Direction.TOP,
+    pygame.K_q: Direction.LEFT,
+    pygame.K_s: Direction.BOTTOM,
+    pygame.K_d: Direction.RIGHT,
+
+    # QWERTY fallback
+    pygame.K_w: Direction.TOP,
+    pygame.K_a: Direction.LEFT,
 }
 
 class Player:
@@ -23,7 +22,16 @@ class Player:
         self.__inventory: Inventory = inventory
         self.selected: Direction = None
         self.__luck: float = 1.0
-        self._selection_sprite = pygame.image.load(r'SelectionImage.png')
+        # Load sprite if available; don't crash if resource missing.
+        try:
+            # Prefer package-relative path; fallback to simple filename.
+            self.selection_sprite = pygame.image.load('src/assets/player.png')
+        except Exception:
+            try:
+                self.selection_sprite = pygame.image.load('player.png')
+            except Exception:
+                self.selection_sprite = None
+
     @property
     def luck(self):
         return self.__luck
@@ -31,23 +39,7 @@ class Player:
     @luck.setter
     def luck(self, value):
         self.__luck = value
-    def try_move_with_key(self, key_label: str, game_map: MansionMap) -> MoveResult:
-        """
-        Ask the map if we can move. If allowed, update position and spend 1 step.
-        key_label: 'Z','Q','S','D' or 'UP','LEFT','DOWN','RIGHT'.
-        """
-        delta = _DIRECTION_DELTAS.get(key_label.upper())
-        if not delta:
-            return MoveResult(False, "INVALID_KEY")
-
-        r, c = self.grid_position
-        target = (r + delta[0], c + delta[1])
-
-        result = game_map.request_move(self.grid_position, target, self.inventory)
-        if result.allowed:
-            self.grid_position = target
-            self.inventory.spend_steps(1)
-        return result
+    # Function was useless
     @property
     def inventory(self):
         return self.__inventory
@@ -60,8 +52,7 @@ class Player:
 
     def add_gems(self, value):
         self.inventory.add_gems(value)
-    
-    
+        
     def add_keys(self, value):
         self.inventory.add_keys(value)
 
@@ -74,6 +65,11 @@ class Player:
     def spend_gems(self, value):
         self.inventory.spend_gems(value)
     
-    
     def spend_keys(self, value):
         self.inventory.spend_keys(value)
+
+    def add_dice(self, value):
+        self.inventory.add_dice(value)
+
+    def spend_dice(self, value):
+        self.inventory.spend_dice(value)

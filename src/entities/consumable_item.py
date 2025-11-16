@@ -1,10 +1,10 @@
 from src.utils.consumable_type import ConsumableType
 from src.entities.object import Object
-
+from src.utils.rarity import Rarity
 
 class ConsumableItem(Object):
     def __init__(self, name: str, quantity: int, type: ConsumableType):
-        super().__init__(name, quantity)
+        super().__init__(name, quantity, Rarity.COMMON)
         self.__type = type
 
     @property
