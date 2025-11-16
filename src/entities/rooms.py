@@ -1,7 +1,7 @@
 from src.entities.blue_room import *
 from src.entities.yellow_room import *
 from src.entities.violet_room import *
-from src.entities.orange_room import OrangeRoom
+from src.entities.orange_room import *
 from src.entities.green_room import GreenRoom
 from src.entities.red_room import RedRoom
 from src.entities.door import Door
@@ -32,6 +32,9 @@ boudoir = Boudoir()
 
 bedroom = Bedroom()
 
+hallway = Hallway()
+
+passageway = Passageway()
 FULL_ROOM_DECK = [
     parlor,
     closet,
@@ -41,5 +44,7 @@ FULL_ROOM_DECK = [
     commissary,
     laundry_room,
     boudoir,
-    bedroom
+    bedroom,
+    hallway,
+    passageway
 ]

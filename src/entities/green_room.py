@@ -61,7 +61,8 @@ class Terrace(GreenRoom):
                             (0.40, ConsumableItem, {'name': 'Gem', 'quantity': 1}),
                             (0.35, ConsumableItem, {'name': 'Gem', 'quantity': 2}),
                             (0.30, ConsumableItem, {'name': 'Gold', 'quantity': 2}),
-                            (0.20, PermanentItem, {'name': 'Shovel', 'quantity': 3})
+                            (0.20, PermanentItem, {'name': 'Shovel', 'quantity': 3}),
+                            (0.3, Event)
         ]
         super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path= sprite_path)
 
