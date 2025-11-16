@@ -6,13 +6,14 @@ class Direction(Enum):
     RIGHT = (1, 0)
     LEFT = (-1, 0)
 
-    @classmethod
+    @staticmethod
     def rotate(direction):
-        if(direction == Direction.BOTTOM):
+        """Rotate a direction 90° clockwise."""
+        if direction == Direction.BOTTOM:
             return Direction.RIGHT
-        if(direction == Direction.RIGHT):
+        if direction == Direction.RIGHT:
             return Direction.TOP
-        if(direction == Direction.TOP):
+        if direction == Direction.TOP:
             return Direction.LEFT
-        if(direction == Direction.LEFT):
+        if direction == Direction.LEFT:
             return Direction.BOTTOM

@@ -11,7 +11,7 @@ from src.session import Session
 class Room(ABC):
     """Abstract base class for all types of rooms in Blue Prince."""
 
-    def __init__(self, session : Session, name: str, price: int, doors: list[Door], rarity: Rarity, possible_items = [], img_path: str = ''):
+    def __init__(self, name: str, price: int, doors: list[Door], rarity: Rarity, session : Session, possible_items: list[Object]=[], img_path = ''):
         self.__name = name
         self.session = session
         self.__price = price
@@ -20,6 +20,8 @@ class Room(ABC):
         self.__possible_items = possible_items or [] # contains special objects
         self.__available_items = []
         self.__sprite = load_image(img_path)
+        # rotation in 90-degree clockwise steps (0..3). This value is updated by Map when the room is rotated.
+        self.__rotation = 0
         self.__visited = False
     # Maybe we gonna add more methods like post_effect or draft_effect
     
@@ -136,17 +138,21 @@ class Room(ABC):
         # Image logic
         if self.__sprite:
             scale_sprite = pygame.transform.scale(self.__sprite, (size, size))
-            screen.blit(scale_sprite)
+            rotation_steps = getattr(self, '_Room__rotation', 0)
+            if rotation_steps:
+                # pygame.transform.rotate uses degrees counter-clockwise, so negative for clockwise
+                angle = -90 * (rotation_steps + 1)
+                rotated = pygame.transform.rotate(scale_sprite, angle)
+                # keep rotated image centered in the tile
+                rotated_rect = rotated.get_rect(center=(x + size // 2, y + size // 2))
+                screen.blit(rotated, rotated_rect.topleft)
+            else:
+                screen.blit(scale_sprite, (x, y))
         else:
             # Base color (you can change based on rarity or price)
             pygame.draw.rect(screen, (200, 200, 200), rect)
         
         pygame.draw.rect(screen, (50, 50, 50), rect, 2) # contour?
-
-        # Draw the name
-        font = pygame.font.Font(None, 18)
-        text = font.render(self.name, True, (0, 0, 0))
-        screen.blit(text, (x + 5, y + 5))
 
         # Draw doors (optional)
 

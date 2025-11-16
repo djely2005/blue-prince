@@ -4,49 +4,17 @@ from src.entities.door import Door
 from abc import abstractmethod
 from src.entities.player import Player
 from src.utils.rarity import Rarity
-from src.entities.other_item import OtherItem
-from src.entities.permanent_item import PermanentItem
 from src.entities.consumable_item import ConsumableItem
-from src.entities.bunny_paw import BunnyPaw
+from src.utils.consumable_type import ConsumableType
 from src.utils.lock_state import LockState
 from src.utils.direction import Direction
-
-# !!!!!! THIS need to be verified because I did it before you defined the classes needed
-# My structure : name_room: (probability, type, list[name, quantity])
-possible_items = {
-    "Parlor": [
-        (0.30, OtherItem, {'name': 'Appel', 'quantity': 1})
-        # the first number is for probability I just did a random number we can change it later if needed
-    ],
-    "Closet": [
-        (0.35, ConsumableItem, {'name': 'Die', 'quantity': 1}),
-        (0.30, ConsumableItem, {'name': 'Gem', 'quantity': 1}),
-        (0.25, ConsumableItem, {'name': 'Key', 'quantity': 1}),
-        (0.20, PermanentItem, {'name': 'Metal Detector', 'quantity': 1}),
-        (0.15, PermanentItem, {'name': 'Shovel', 'quantity': 1}),
-        (0.05, BunnyPaw, {'name': 'BunnyPaw', 'quantity': 1})
-    ],
-    "Nook": [
-        (0.30, ConsumableItem, {'name': 'Die', 'quantity': 1})
-    ],
-    "Den": [
-        (0.30, ConsumableItem, {'name': 'Die', 'quantity': 1}),
-        (0.05, BunnyPaw, {'name': 'BunnyPaw', 'quantity': 1})
-    ],
-    "Pantry": [
-        (0.35, OtherItem, {'name': 'Appel', 'quantity': 1}),
-        (0.25, OtherItem, {'name': 'Appel', 'quantity': 3}),
-        (0.20, OtherItem, {'name': 'Banana', 'quantity': 1}),
-        (0.15, OtherItem, {'name': 'Banana', 'quantity': 2}),
-        (0.15, OtherItem, {'name': 'Orange', 'quantity': 1})
-    ]
-
-}
+from src.session import session
 
 class BlueRoom(Room):
     def __init__(self, name: str, price: int, doors: list[Door], rarity: Rarity, possible_items = [], img_path: str = ''):
-        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path = img_path)
-    
+        # Keep session passed through to Room; BlueRoom adds no extra state currently
+        super().__init__(name, price, doors, rarity, session, possible_items= possible_items, img_path = img_path)
+
     @abstractmethod
     def on_enter(self, player):
         return super().on_enter(player)
@@ -59,32 +27,30 @@ class BlueRoom(Room):
     def shop(self, player, choice: str):
         return super().shop(player)
 
-    def apply_effect(self, player: Player):
-        pass
 
 class EntranceHall(BlueRoom):
     def __init__(self):
         name = "Entrance Hall"
         price = 0
         doors = [
-            Door(LockState.DOUBLE_LOCKED, Direction.TOP),
-            Door(LockState.DOUBLE_LOCKED, Direction.LEFT),
-            Door(LockState.DOUBLE_LOCKED, Direction.RIGHT),
+            Door(LockState.UNLOCKED, Direction.TOP),
+            Door(LockState.UNLOCKED, Direction.LEFT),
+            Door(LockState.UNLOCKED, Direction.RIGHT),
         ]
         rarity = Rarity.COMMON
-        possible_items = []
-        sprite_path="rooms/entrance_hall.png"
-        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path= sprite_path)
+        possible_items = [] # To define
+        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path='rooms/Entrance_Hall.webp')
     
     def on_enter(self, player: Player):
-        # WIN
-        pass
+        # Starting room: mark visited on entry
+        self.visited = True
     
     def on_draft(self, player):
         pass
     
     def shop(self, player, choice: str):
         return super().shop(player, choice)
+
 
 class Parlor(BlueRoom):
     def __init__(self):
@@ -95,12 +61,12 @@ class Parlor(BlueRoom):
             Door(LockState.DOUBLE_LOCKED, Direction.LEFT),
         ]
         rarity = Rarity.COMMON
-        possible_items = [0.30, OtherItem, {'name': 'Appel', 'quantity': 1}]
-        sprite_path="rooms/parlor.png"
-        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path= sprite_path)
+        possible_items = [] # To define
+        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path='rooms/Parlor.webp')
     
     def on_enter(self, player: Player):
-        pass
+        # Neutral room — mark visited on entry
+        self.visited = True
     
     def on_draft(self, player):
         pass
@@ -108,49 +74,49 @@ class Parlor(BlueRoom):
     def shop(self, player, choice: str):
         return super().shop(player, choice)
 
+
 class Nook(BlueRoom):
     def __init__(self):
         name = "Nook"
         price = 0
+        # L-shaped: bottom + left (example)
         doors = [
             Door(LockState.DOUBLE_LOCKED, Direction.BOTTOM),
             Door(LockState.DOUBLE_LOCKED, Direction.LEFT),
         ]
         rarity = Rarity.COMMON
-        possible_items = [0.30, ConsumableItem, {'name': 'Die', 'quantity': 1}]
-        sprite_path="rooms/nook.png"
-        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path= sprite_path)
+        possible_items = [] # To define
+        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path='rooms/Nook.png')
     
     def on_enter(self, player: Player):
-        if (self.visited): return
+        # Nook contains a single Key on first visit
+        if self.visited:
+            return
         player.add_keys(1)
         self.visited = True
     
     def on_draft(self, player):
         return super().on_draft(player)
     
-    def shop(self, player, choice: str):
-        return super().shop(player, choice)
-    
+
 class Den(BlueRoom):
     def __init__(self):
         name = "Den"
         price = 0
+        # T-shaped: left, bottom, right (example)
         doors = [
             Door(LockState.DOUBLE_LOCKED, Direction.BOTTOM),
             Door(LockState.DOUBLE_LOCKED, Direction.LEFT),
             Door(LockState.DOUBLE_LOCKED, Direction.RIGHT)
         ]
         rarity = Rarity.COMMON
-        possible_items = [
-                            (0.30, ConsumableItem, {'name': 'Die', 'quantity': 1}),
-                            (0.05, BunnyPaw, {'name': 'BunnyPaw', 'quantity': 1})
-        ]
-        sprite_path="rooms/den.png"
-        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path= sprite_path)
+        possible_items = []
+        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path='rooms/Den.webp')
     
     def on_enter(self, player: Player):
-        if (self.visited): return
+        # Den contains a Gem on first visit
+        if self.visited:
+            return
         player.add_gems(1)
         self.visited = True
     
@@ -160,28 +126,44 @@ class Den(BlueRoom):
     def shop(self, player, choice: str):
         return super().shop(player, choice)
 
-class Pantary(BlueRoom):
+
+class Pantry(BlueRoom):
     def __init__(self):
-        name = "Pantary"
+        name = "Pantry"
         price = 0
         doors = [
             Door(LockState.DOUBLE_LOCKED, Direction.BOTTOM),
             Door(LockState.DOUBLE_LOCKED, Direction.LEFT),
         ]
         rarity = Rarity.COMMON
+        # possible_items tuples are (base_probability, item_class, init_kwargs)
         possible_items = [
-                            (0.35, OtherItem, {'name': 'Appel', 'quantity': 1}),
-                            (0.25, OtherItem, {'name': 'Appel', 'quantity': 3}),
-                            (0.20, OtherItem, {'name': 'Banana', 'quantity': 1}),
-                            (0.15, OtherItem, {'name': 'Banana', 'quantity': 2}),
-                            (0.15, OtherItem, {'name': 'Orange', 'quantity': 1})
-    ]
-        sprite_path="rooms/pantry.png"
-        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path= sprite_path)
+            (1.0, ConsumableItem, { 'name': 'Gold', 'quantity': 4, 'type': ConsumableType.MONEY }),
+            (0.8, ConsumableItem, { 'name': 'Apple', 'quantity': 2, 'type': ConsumableType.STEP }),
+            (0.6, ConsumableItem, { 'name': 'Banana', 'quantity': 3, 'type': ConsumableType.STEP }),
+            (0.4, ConsumableItem, { 'name': 'Orange', 'quantity': 5, 'type': ConsumableType.STEP }),
+        ]
+        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path='rooms/Pantry.png')
     
     def on_enter(self, player: Player):
-        if (self.visited): return
-        player.add_money(4)
+        # Pantry contains a note and guaranteed loot on first visit:
+        # guaranteed 4 Gold and at least one fruit (Apple/Banana/Orange).
+        if self.visited:
+            return
+
+        # Add guaranteed gold
+        gold = ConsumableItem('Gold', 4, ConsumableType.MONEY)
+        self.available_items.append(gold)
+
+        # Add at least one fruit. Currently deterministic: Apple.
+        # Replace with random.choice(...) if you want variability.
+        fruit = ConsumableItem('Apple', 2, ConsumableType.STEP)
+        self.available_items.append(fruit)
+
+        # Add a pantry note (informational)
+        note = ConsumableItem('Pantry Note', 1, ConsumableType.DICE)
+        self.available_items.append(note)
+
         self.visited = True
     
     def on_draft(self, player):
@@ -189,6 +171,7 @@ class Pantary(BlueRoom):
     
     def shop(self, player, choice: str):
         return super().shop(player, choice)
+
 
 class Antechamber(BlueRoom):  
     def __init__(self):
@@ -200,9 +183,8 @@ class Antechamber(BlueRoom):
             Door(LockState.DOUBLE_LOCKED, Direction.RIGHT),
         ]
         rarity = Rarity.COMMON
-        possible_items = []
-        sprite_path="rooms/ante_chambre.png"
-        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path= sprite_path)
+        possible_items = [] # To define
+        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path='rooms/Antechamber.webp')
     
     def on_enter(self, player: Player):
         # WIN
@@ -214,6 +196,7 @@ class Antechamber(BlueRoom):
     def shop(self, player, choice: str):
         return super().shop(player, choice)
 
+
 class Closet(BlueRoom):  
     def __init__(self):
         name = "Closet"
@@ -222,19 +205,23 @@ class Closet(BlueRoom):
             Door(LockState.DOUBLE_LOCKED, Direction.BOTTOM),
         ]
         rarity = Rarity.COMMON
-        possible_items = [
-                            (0.35, ConsumableItem, {'name': 'Die', 'quantity': 1}),
-                            (0.30, ConsumableItem, {'name': 'Gem', 'quantity': 1}),
-                            (0.25, ConsumableItem, {'name': 'Key', 'quantity': 1}),
-                            (0.20, PermanentItem, {'name': 'Metal Detector', 'quantity': 1}),
-                            (0.15, PermanentItem, {'name': 'Shovel', 'quantity': 1}),
-                            (0.05, BunnyPaw, {'name': 'BunnyPaw', 'quantity': 1})
-    ]
-        sprite_path="rooms/closet.png"
-        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path= sprite_path)
+        possible_items = [] # To define
+        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path='rooms/Closet.webp')
     
     def on_enter(self, player: Player):
-        pass
+        # Closet gives access to two items. Fill available_items with two common items if not visited.
+        if self.visited:
+            return
+        common_items = [
+            ConsumableItem('Apple', 2, ConsumableType.STEP),
+            ConsumableItem('Gold', 1, ConsumableType.MONEY),
+            ConsumableItem('Key', 1, ConsumableType.KEY),
+            ConsumableItem('Gem', 1, ConsumableType.GEM),
+        ]
+        # Pick first two to keep deterministic; can be randomized later
+        self.available_items.append(common_items[0])
+        self.available_items.append(common_items[1])
+        self.visited = True
     
     def on_draft(self, player):
         pass
