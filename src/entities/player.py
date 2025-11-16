@@ -19,7 +19,7 @@ _DIRECTION_MAP = {
 
 class Player:
     def __init__(self, grid_position: Tuple[int, int], inventory: Inventory) -> None:
-        self.grid_position: Tuple[int, int] = [0, 3]
+        self.grid_position: Tuple[int, int] = grid_position
         self.__inventory: Inventory = inventory
         self.selected: Direction = None
         self.__luck: float = 1.0
