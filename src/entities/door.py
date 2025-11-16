@@ -34,18 +34,19 @@ class Door :
             return False
 
         if self.__lock_state == LockState.UNLOCKED:
+            inv.spend_steps(1)
             return True
 
         if self.__lock_state == LockState.LOCKED:
             # spend a single key
-            return inv.spend_keys(1)
+            ok = inv.spend_keys(1)
+            if ok: inv.spend_steps(1)
+            return ok
 
         if self.__lock_state == LockState.DOUBLE_LOCKED:
             # need two keys
-            ok1 = inv.spend_keys(1)
-            if not ok1:
-                return False
-            ok2 = inv.spend_keys(1)
+            ok2 = inv.spend_keys(2)
+            if ok2: inv.spend_steps(1)
             return ok2
 
         return False

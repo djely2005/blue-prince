@@ -1,5 +1,9 @@
 from src.entities.room import Room
 from src.entities.blue_room import BlueRoom
+from src.entities.green_room import GreenRoom
+from src.entities.pit import Pit
+from src.entities.locker import Locker
+from src.entities.chest import Chest
 from src.entities.door import Door
 from src.utils.direction import Direction
 import pygame
@@ -34,8 +38,10 @@ class Map:
         self.random = random.Random(seed)
         self.__pending_door = None  # Stores (position, direction) when door is opened
         self.__room_rotation = {}  # Tracks how many times each room is rotated
-        
-
+		# Game state flags
+        self.game_over = False
+        self.game_over_message = ""
+        self.game_over_reason = None  # 'win' or 'lose'
     @property
     def seed(self):
         return self.__seed
@@ -71,18 +77,35 @@ class Map:
             self.__update_selected_sprite(screen, player.grid_position, TILE_SIZE, player)
 
     def __update_selected_sprite(self, screen: pygame.Surface, pos: tuple[int, int], size: int, player: Player):
-        x, y = pos
+        """Draw the selection indicator showing which door the player is selecting."""
+        r, c = pos
         if player.selection_sprite:
-            scale_sprite = pygame.transform.scale(player.selection_sprite, (size, size))
-            x = OFFSET_X + x * TILE_SIZE
-            y = OFFSET_Y + y * TILE_SIZE
+            x = OFFSET_X + c * TILE_SIZE
+            y = OFFSET_Y + r * TILE_SIZE
+            # Scale the sprite to fit within the tile
+            scale_sprite = pygame.transform.scale(player.selection_sprite, (size // 2, size // 2))
+            
+            # Position the indicator at the edge of the tile based on direction
             if player.selected == Direction.TOP:
                 scale_sprite = pygame.transform.rotate(scale_sprite, -90)
-            if player.selected == Direction.BOTTOM:
+                indicator_x = x + size // 2 - size // 4
+                indicator_y = y - size // 4
+            elif player.selected == Direction.BOTTOM:
                 scale_sprite = pygame.transform.rotate(scale_sprite, 90)
-            if player.selected == Direction.RIGHT:
+                indicator_x = x + size // 2 - size // 4
+                indicator_y = y + size + size // 4 - size // 2
+            elif player.selected == Direction.RIGHT:
                 scale_sprite = pygame.transform.rotate(scale_sprite, 180)
-            screen.blit(scale_sprite, (x, y))
+                indicator_x = x + size + size // 4 - size // 2
+                indicator_y = y + size // 2 - size // 4
+            elif player.selected == Direction.LEFT:
+                scale_sprite = pygame.transform.rotate(scale_sprite, 0)
+                indicator_x = x - size // 4
+                indicator_y = y + size // 2 - size // 4
+            else:
+                return
+            
+            screen.blit(scale_sprite, (indicator_x, indicator_y))
 
     def draw(self, screen: pygame.Surface):
         """Draw the left-side map area."""
@@ -97,15 +120,14 @@ class Map:
                     room.draw(screen, (x, y), TILE_SIZE)
 
     def draw_player_position(self, screen: pygame.Surface, player: Player):
-        """Draw a small dot indicating the player's current position."""
+        """Draw a visual indicator of the player's current position."""
         r, c = player.grid_position
         x = OFFSET_X + c * TILE_SIZE + TILE_SIZE // 2
         y = OFFSET_Y + r * TILE_SIZE + TILE_SIZE // 2
-        # Draw a small red dot at the center of the room
-        pygame.draw.circle(screen, (255, 0, 0), (x, y), 5)
+        # Draw a larger circle indicator with a border for better visibility
+        pygame.draw.circle(screen, (255, 100, 100), (x, y), 8)
+        pygame.draw.circle(screen, (200, 0, 0), (x, y), 8, 2)
     
-    def open_door(self):
-        pass
     def __is_room_accessible_by_door(self, position: tuple[int, int], direction: Direction) -> bool:
         # Safely check neighbouring room and whether it has a matching door
         r, c = position
@@ -276,6 +298,25 @@ class Map:
         
         return selected
 
+    def reset(self, seed: int):
+        """Reset the map to a fresh state using `seed` for deterministic RNG.
+        This mirrors the initialization logic so callers can reuse the module-level
+        `game_map` instance without re-importing modules.
+        """
+        self.__seed = seed
+        self.__grid = [[None for _ in range(GRID_WIDTH)] for _ in range(GRID_HEIGHT)]
+        start_r = GRID_HEIGHT - 1
+        center_c = GRID_WIDTH // 2 + 1
+        # reuse templates from rooms module
+        self.__grid[start_r][center_c] = entrance_hall
+        self.__grid[0][center_c] = ante_chambre
+        self.random = random.Random(seed)
+        self.__pending_door = None
+        self.__room_rotation = {}
+        self.game_over = False
+        self.game_over_message = ""
+        self.game_over_reason = None
+
     def handle_room_selection(self, selected_room: Room, player: Player) -> bool:
         """
         Place the selected room on the map and move the player into it.
@@ -382,7 +423,42 @@ class Map:
         # Trigger on_enter effect
         # Provide the map's seeded RNG to the room so room effects (shops) can be deterministic
         setattr(new_room, '_room_random', self.random)
+        # Attach an event to the room automatically depending on its type.
+        # Use the map's seeded RNG so event placement is deterministic.
+        try:
+            rnd = self.random
+            # Green rooms -> Pit; Blue rooms -> Locker; Others -> Chest (lower chance)
+            if isinstance(selected_room, GreenRoom):
+                if rnd.random() < 0.35:
+                    evt = Pit()
+                    setattr(evt, '_room_random', rnd)
+                    new_room.event = evt
+            elif isinstance(selected_room, BlueRoom):
+                if rnd.random() < 0.35:
+                    evt = Locker()
+                    setattr(evt, '_room_random', rnd)
+                    new_room.event = evt
+            else:
+                # Other rooms (red/orange/etc) get chests less frequently
+                if rnd.random() < 0.25:
+                    evt = Chest()
+                    setattr(evt, '_room_random', rnd)
+                    new_room.event = evt
+        except Exception:
+            # non-fatal: if event classes aren't available, skip event spawning
+            pass
+
+        new_room.on_draft(player)
         new_room.on_enter(player)
+
+        # If this room is the Antechamber, the player wins the game
+        try:
+            if getattr(new_room, 'name', '') == 'Antechamber':
+                self.game_over = True
+                self.game_over_message = 'You reached the Antechamber — You win!'
+                self.game_over_reason = 'win'
+        except Exception:
+            pass
 
         # Synchronize adjacent room doors
         self._synchronize_adjacent_doors(new_r, new_c)
@@ -448,7 +524,7 @@ class Map:
         cloned_room._Room__price = room.price
         cloned_room._Room__doors = cloned_doors
         cloned_room._Room__rarity = room.rarity
-        cloned_room._Room__possible_items = room.possible_item
+        cloned_room._Room__possible_items = room.possible_items
         cloned_room._Room__available_items = list(room.available_items) if room.available_items else []
         cloned_room._Room__sprite = room._Room__sprite  # Share sprite (it's read-only)
         cloned_room._Room__visited = False  # Reset visited state
@@ -523,13 +599,38 @@ class Map:
             # Check bounds
             if not (0 <= adj_r < GRID_HEIGHT and 0 <= adj_c < GRID_WIDTH):
                 continue
-
             adjacent_room = self.__grid[adj_r][adj_c]
             # Include the room if it exists and has been visited
-            if isinstance(adjacent_room, Room) and adjacent_room.visited:
+            if isinstance(adjacent_room, Room):
                 adjacent_visited[direction] = adjacent_room
         return adjacent_visited
 
+
+    def check_if_room_exist_in_position(self, player: Player, target_direction: Direction):
+        r, c = player.grid_position
+
+        # Calculate target position
+        if target_direction == Direction.TOP:
+            new_r, new_c = r - 1, c
+        elif target_direction == Direction.BOTTOM:
+            new_r, new_c = r + 1, c
+        elif target_direction == Direction.LEFT:
+            new_r, new_c = r, c - 1
+        elif target_direction == Direction.RIGHT:
+            new_r, new_c = r, c + 1
+        else:
+            return False
+
+        # Check bounds
+        if not (0 <= new_r < GRID_HEIGHT and 0 <= new_c < GRID_WIDTH):
+            return False
+
+        target_room = self.__grid[new_r][new_c]
+        
+        # Must be a visited room
+        if not isinstance(target_room, Room):
+            return False
+        return True
     def move_to_adjacent_room(self, player: Player, target_direction: Direction) -> bool:
         """
         Move the player to an adjacent visited room.
@@ -562,12 +663,14 @@ class Map:
         target_room = self.__grid[new_r][new_c]
         
         # Must be a visited room
-        if not isinstance(target_room, Room) or not target_room.visited:
+        if not isinstance(target_room, Room):
             return False
 
         # Move the player
         player.grid_position = (new_r, new_c)
+        target_room.on_enter(player)
+        player.spend_steps(1)
         return True
 
 
-game_map = Map(0)
+game_map = Map(50)

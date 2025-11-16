@@ -38,10 +38,17 @@ class Commissary(YellowRoom):
     owned by the player are marked via `ShopItem.owned = True` so the UI can label them.
     """
     def __init__(self, name: str = "Commissary", price: int = 0, doors: list[Door] = None, rarity: Rarity = Rarity.STANDARD, img_path: str = 'rooms/Commissary.webp'):
-        doors = doors or [Door(LockState.LOCKED, Direction.BOTTOM)]
-        super().__init__(name, price, doors, rarity, possible_items=[], img_path=img_path)
+        doors = doors or [Door(LockState.LOCKED, Direction.BOTTOM), Door(LockState.LOCKED, Direction.LEFT)]
+        super().__init__(name, price, doors, rarity, possible_items=[
+            (Shovel, 'Shovel', 10),
+            (MetalDetector, 'Metal Detector', 30),
+            (LockPick, 'Lock Pick', 20),
+            (Hammer, 'Hammer', 15),
+            (BunnyPaw, 'Bunny Paw', 25),
 
-    def on_enter(self, player: Player):
+        ], img_path=img_path)
+
+    def on_draft(self, player: Player):
         # Build a deterministic dynamic shop inventory based on player.luck
         # Use the room-provided RNG set by Map (`_room_random`) if available, otherwise fall back to session RNG
         rnd = getattr(self, '_room_random', None) or getattr(self.session, 'random', None) or random.Random()
@@ -49,15 +56,8 @@ class Commissary(YellowRoom):
         luck = max(0.0, getattr(player, 'luck', 1.0))
         count = min(5, max(1, 1 + int(luck)))
 
-        candidates = [
-            (Shovel, 'Shovel', 10),
-            (MetalDetector, 'Metal Detector', 30),
-            (LockPick, 'Lock Pick', 20),
-            (Hammer, 'Hammer', 15),
-            (BunnyPaw, 'Bunny Paw', 25),
-        ]
 
-        pool = list(candidates)
+        pool = list(self.possible_items)
         offers = []
         for _ in range(count):
             if not pool:
@@ -65,7 +65,7 @@ class Commissary(YellowRoom):
             idx = rnd.randrange(len(pool))
             cls, label, base_price = pool.pop(idx)
             price = max(1, int(base_price * (1 + (0.2 * (luck - 1)))))
-            item = cls(label, 1)
+            item = cls()
             shop_item = ShopItem(item, price)
             # Mark as owned if player already has it
             for p in player.inventory.permanentItems:
@@ -78,7 +78,7 @@ class Commissary(YellowRoom):
         if rnd.random() < min(0.9, 0.25 + 0.15 * luck):
             offers.append(ShopItem(ConsumableItem('Gems', 1 + int(luck), ConsumableType.GEM), 5 * max(1, int(luck))))
 
-        self.possible_item = offers[:5]
+        self.possible_items = offers[:5]
         return super().on_enter(player)
 
 
@@ -94,7 +94,7 @@ class LaundryRoom(YellowRoom):
         doors = doors or [Door(LockState.DOUBLE_LOCKED, Direction.BOTTOM)]
         super().__init__(name, price, doors, rarity, possible_items=[], img_path=img_path)
 
-    def on_enter(self, player: Player):
+    def on_draft(self, player: Player):
         # Build three service ShopItems. The ShopItem.item will be a simple dict describing the service
         services = []
 

@@ -25,4 +25,4 @@ class Session():
 
 player = Player((GRID_HEIGHT - 1, math.ceil(GRID_WIDTH/2) ), Inventory())
 
-session = Session(player, 0)
+session = Session(player, 50)

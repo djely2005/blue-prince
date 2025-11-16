@@ -10,17 +10,6 @@ from src.entities.bunny_paw import BunnyPaw
 from src.utils.lock_state import LockState
 from src.utils.direction import Direction
 
-# !!!!!! THIS need to be verified because I did it before you defined the classes needed
-# My structure : name_room: (probability, type, list[name, quantity])
-possible_items = {
-    "Hallway": [
-        (0.25, ConsumableItem, {'name': 'Gold', 'quantity': 1}),
-        (0.15, ConsumableItem, {'name': 'Gem', 'quantity': 1})
-        # the first number is for probability I just did a random number we can change it later if needed
-    ],
-    "Passageway": []
-}
-
 from src.entities.room import Room
 from src.entities.door import Door
 from abc import abstractmethod
@@ -32,6 +21,7 @@ from src.entities.consumable_item import ConsumableItem
 from src.entities.bunny_paw import BunnyPaw
 from src.utils.lock_state import LockState
 from src.utils.direction import Direction
+from src.session import session
 
 # !!!!!! THIS need to be verified because I did it before you defined the classes needed
 # My structure : name_room: (probability, type, list[name, quantity])
@@ -54,7 +44,7 @@ possible_items = {
 
 class OrangeRoom(Room):
     def __init__(self, name: str, price: int, doors: list[Door], rarity: Rarity, possible_items = [], img_path: str = ''):
-        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path= img_path)
+        super().__init__(name, price, doors, rarity, session, possible_items= possible_items, img_path= img_path)
     
     @abstractmethod
     def on_enter(self, player):
@@ -63,21 +53,36 @@ class OrangeRoom(Room):
     @abstractmethod
     def on_draft(self, player):
         return super().on_draft(player)
-    
-    @abstractmethod
-    def shop(self, player, choice: str):
-        return super().shop(player)
 
     def apply_effect(self, player: Player):
         pass
+    
+    def discover_items(self, player):
+        """
+        Samples items from possible_items based on player luck.
+        Luck increases probability of discovering items (minimum 10%).
+        """
+        for probability, item_class, kwargs in self.possible_items:
+            # Adjust probability by player luck (multiplier between 0.1 and 1.0)
+            final_prob = probability * max(0.1, player.luck)
+            if self._room_random.random() < final_prob:
+                # Create the item and add to inventory
+                item = item_class(**kwargs)
+                if hasattr(item, 'type') and hasattr(item.type, 'name'):
+                    # ConsumableItem: add to otherItems
+                    self.available_items.append(item)
+                else:
+                    # PermanentItem or OtherItem: add accordingly
+                    if hasattr(player.inventory, 'otherItems'):
+                        self.available_items.append(item)
 
 class Hallway(OrangeRoom):
     def __init__(self):
-        name="Hallway", 
-        price=0, 
-        doors=[Door(LockState.UNLOCKED, Direction.BOTTOM), Door(LockState.UNLOCKED, Direction.LEFT), Door(LockState.UNLOCKED, Direction.RIGHT)],
+        name="Hallway" 
+        price=0
+        doors=[Door(LockState.UNLOCKED, Direction.BOTTOM), Door(LockState.UNLOCKED, Direction.LEFT), Door(LockState.UNLOCKED, Direction.RIGHT)]
         rarity=Rarity.COMMON
-        sprite_path = "rooms/hallway.png"
+        sprite_path = "rooms/Hallway.png"
         possible_items =[
                             (0.50, OtherItem, {'name': 'Banana', 'quantity': 1}),
                             (0.45, OtherItem, {'name': 'Orange', 'quantity': 1}),
@@ -92,18 +97,18 @@ class Hallway(OrangeRoom):
         return super().on_enter(player)
     
     def on_draft(self, player):
-        return super().on_draft(player)
+        self.discover_items(player)
     
     def shop(self, player, choice: str):
         return super().shop(player, choice)
 
 class Passageway(OrangeRoom):
     def __init__(self):
-        name="Passageway", 
+        name="Passageway"
         price=2
         doors=[Door(LockState.UNLOCKED, Direction.BOTTOM), Door(LockState.UNLOCKED, Direction.TOP), Door(LockState.UNLOCKED, Direction.LEFT), Door(LockState.UNLOCKED, Direction.RIGHT)]
         rarity=Rarity.COMMON
-        sprite_path = "rooms/passegeway.png"
+        sprite_path = "rooms/Passageway.webp"
         possible_items = [
                             (0.50, ConsumableItem, {'name': 'Gem', 'quantity': 1}),
                             (0.35, PermanentItem, {'name': 'Shovel', 'quantity': 1})
@@ -114,7 +119,7 @@ class Passageway(OrangeRoom):
         return super().on_enter(player)
     
     def on_draft(self, player):
-        return super().on_draft(player)
+        self.discover_items(player)
     
     def shop(self, player, choice: str):
         return super().shop(player, choice)

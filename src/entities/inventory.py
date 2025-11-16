@@ -2,21 +2,25 @@ from dataclasses import dataclass
 from src.entities.permanent_item import PermanentItem
 from src.entities.consumable_item import ConsumableItem
 from src.utils.consumable_type import ConsumableType
+from src.entities.lock_pick import LockPick
 # Should we reconsider the implementation of inventory ?
 # I think we need a better structure
 class Inventory:
     def __init__(self):
         """Explicit names preferred. Counts start as per spec; adjust if design changes."""
-        self.permanentItems: list[PermanentItem] = []
+        self.permanentItems: list[PermanentItem] = [
+            LockPick()
+        ]
         self.steps: ConsumableItem = ConsumableItem('Steps', 70, ConsumableType.STEP)
         self.money: ConsumableItem = ConsumableItem('Money', 50, ConsumableType.MONEY)
         self.gems: ConsumableItem = ConsumableItem('Gems', 30, ConsumableType.GEM)
-        self.keys: ConsumableItem = ConsumableItem('keys', 0, ConsumableType.KEY)
+        self.keys: ConsumableItem = ConsumableItem('keys', 100, ConsumableType.KEY)
         self.dice: ConsumableItem = ConsumableItem('Dice', 20, ConsumableType.DICE)
         # Keep constructor minimal; avoid side-effects here.
     # Needs to be private
 
-
+    def add_permanent_item(self, value: PermanentItem):
+        self.permanentItems.append(value)
     # Let's keep the method for later
     # We use clear verbs and explicit intent.
     def spend_steps(self, n: int) -> None:
@@ -85,3 +89,36 @@ class Inventory:
         # Return True if any permanent items exist. Specific queries
         # (has_shovel, etc.) should be added if needed.
         return len(self.permanentItems) > 0
+
+    def use_other_item(self, item) -> str:
+        """Use/consume an OtherItem. Returns a message about the effect.
+        Handles ConsumableItems and OtherItems based on their type.
+        """
+        
+        # Get the item's type and quantity
+        bonus = getattr(item, 'quantity', 5)
+        item_type = getattr(item, 'type', None)
+        
+        # Apply the effect based on type
+        if item_type and hasattr(item_type, 'name'):
+            type_name = item_type.name
+            if type_name == 'STEP':
+                self.add_steps(bonus)
+                msg = f"Used {item.name}! Gained {bonus} steps."
+            elif type_name == 'MONEY':
+                self.add_money(bonus)
+                msg = f"Used {item.name}! Gained {bonus} money."
+            elif type_name == 'GEM':
+                self.add_gems(bonus)
+                msg = f"Used {item.name}! Gained {bonus} gems."
+            elif type_name == 'KEY':
+                self.add_keys(bonus)
+                msg = f"Used {item.name}! Gained {bonus} keys."
+            else:
+                msg = f"Used {item.name}!"
+        else:
+            # Default: assume steps
+            self.add_steps(bonus)
+            msg = f"Used {item.name}! Gained {bonus} steps."
+        
+        return msg

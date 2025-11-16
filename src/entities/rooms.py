@@ -1,13 +1,9 @@
 from src.entities.blue_room import *
 from src.entities.yellow_room import *
-from src.entities.violet_room import VioletRoom
-from src.entities.orange_room import OrangeRoom
-from src.entities.green_room import GreenRoom
-from src.entities.red_room import RedRoom
-from src.entities.door import Door
-from src.utils.direction import Direction
-from src.utils.lock_state import LockState
-from src.utils.rarity import Rarity
+from src.entities.violet_room import *
+from src.entities.orange_room import *
+from src.entities.green_room import *
+from src.entities.red_room import *
 
 entrance_hall = EntranceHall()
 entrance_hall.visited = True
@@ -28,6 +24,23 @@ commissary = Commissary()
 
 laundry_room = LaundryRoom()
 
+boudoir = Boudoir()
+
+bedroom = Bedroom()
+
+guest_bedroom = GuestBedroom()
+
+hallway = Hallway()
+
+terance = Terrace()
+
+veranda = Veranda()
+
+gymnasium = Gymnasium()
+
+chapel = Chapel()
+
+passageway = Passageway()
 FULL_ROOM_DECK = [
     parlor,
     closet,
@@ -35,5 +48,14 @@ FULL_ROOM_DECK = [
     den,
     pantry,
     commissary,
-    laundry_room
+    laundry_room,
+    boudoir,
+    bedroom,
+    guest_bedroom,
+    hallway,
+    passageway,
+    terance,
+    veranda,
+    gymnasium,
+    chapel,
 ]
