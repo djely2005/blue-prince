@@ -9,11 +9,21 @@ import random
 from src.entities.inventory import Inventory
 from src.utils.lock_state import LockState
 from src.entities.player import Player
+_DIRECTION_MAP = {
+    # AZERTY
+    pygame.K_z: Direction.TOP,
+    pygame.K_q: Direction.LEFT,
+    pygame.K_s: Direction.BOTTOM,
+    pygame.K_d: Direction.RIGHT,
 
+    # QWERTY fallback
+    pygame.K_w: Direction.TOP,
+    pygame.K_a: Direction.LEFT,
+}
 class Map:
     def __init__(self, seed: int):
         self.__seed = seed
-        self.__grid: list[Room] = [[entrance_hall for _ in range(GRID_WIDTH)] for _ in range(GRID_HEIGHT)]
+        self.__grid: list[Room] = [[None for _ in range(GRID_WIDTH)] for _ in range(GRID_HEIGHT)]
         self.__grid[math.ceil(GRID_HEIGHT/2)][math.ceil(GRID_WIDTH/2)] = entrance_hall
         self.__grid[0][math.ceil(GRID_WIDTH/2)] = ante_chambre
         self.random = random.Random(seed)
@@ -31,12 +41,45 @@ class Map:
     def grid(self):
         return self.__grid
 
+    def update_selected_direction(self, player: Player, screen: pygame.Surface):
+        keys = pygame.key.get_pressed()
+        r, c = player.grid_position
+        room: Room = self.grid[r][c]
+        for key, direction in _DIRECTION_MAP.items():
+            if keys[key]:
+
+                # 1. Check if a door exists in that direction
+
+                if not room.door_direction_exists(direction):
+                    player.selected = None
+                    return  # blocked, do nothing
+
+                # 3. Update player's selection
+                player.selected = direction
+                # 2. Update sprite on map
+                self.__update_selected_sprite(screen, player.grid_position, TILE_SIZE, player)
+
+                return  # first key wins
+        if player.selected:
+            self.__update_selected_sprite(screen, player.grid_position, TILE_SIZE, player)
+
+    def __update_selected_sprite(self, screen: pygame.Surface, pos: tuple[int, int], size: int, player: Player):
+        x, y = pos
+        if player.selection_sprite:
+            scale_sprite = pygame.transform.scale(player.selection_sprite, (size, size))
+            x = OFFSET_X + x * TILE_SIZE
+            y = OFFSET_Y + y * TILE_SIZE
+            if player.selected == Direction.TOP:
+                scale_sprite = pygame.transform.rotate(scale_sprite, -90)
+            if player.selected == Direction.BOTTOM:
+                scale_sprite = pygame.transform.rotate(scale_sprite, 90)
+            if player.selected == Direction.RIGHT:
+                scale_sprite = pygame.transform.rotate(scale_sprite, 180)
+            screen.blit(scale_sprite, (x, y))
+
     def draw(self, screen: pygame.Surface):
         """Draw the left-side map area."""
         map_rect = pygame.Rect(0, 0, MAP_WIDTH, HEIGHT)
-        TILE_SIZE = 64
-        OFFSET_X = 20
-        OFFSET_Y = 20
         pygame.draw.rect(screen, BLUE, map_rect)
 
         for row_idx, row in enumerate(self.grid):
@@ -143,3 +186,6 @@ class Map:
             door.lock_state = new_lock_state
         
         return room_template
+
+
+map = Map(0)

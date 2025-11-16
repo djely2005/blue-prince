@@ -2,6 +2,7 @@ import random
 from src.entities.player import Player
 from src.settings import *
 from src.entities.inventory import Inventory
+import math
 class Session():
     def __init__(self, player:Player,seed: int):
         self.__seed = seed
@@ -23,6 +24,6 @@ class Session():
 
         return int(min_val + biased * (max_val - min_val))
 
-player = Player((GRID_WIDTH // 2, MAP_WIDTH // 2 ), Inventory())
+player = Player((GRID_HEIGHT - 1, math.ceil(GRID_WIDTH/2) ), Inventory())
 
 session = Session(player, 0)

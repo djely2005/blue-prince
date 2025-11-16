@@ -21,6 +21,7 @@ class Door :
     def direction(self, direction):
         self.__direction = direction
 
+
     # Iam not sure if this method should be added here ?
     def open_door(self, player: Inventory) -> bool:
         """Open the door with the keys of the player's inventory"""  

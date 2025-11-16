@@ -2,18 +2,19 @@
 from typing import Tuple
 from src.entities.inventory import Inventory
 from src.utils.direction import Direction
+from src.settings import *
 import pygame
 # keep long/explicit names
-_DIRECTION_DELTAS = {
-    "Z": (-1, 0),  # up  (AZERTY)
-    "Q": (0, -1),  # left
-    "S": (1,  0),  # down
-    "D": (0,  1),  # right
-    # also allow arrows for convenience
-    "UP":    (-1, 0),
-    "LEFT":  (0, -1),
-    "DOWN":  (1, 0),
-    "RIGHT": (0, 1),
+_DIRECTION_MAP = {
+    # AZERTY
+    pygame.K_z: Direction.TOP,
+    pygame.K_q: Direction.LEFT,
+    pygame.K_s: Direction.BOTTOM,
+    pygame.K_d: Direction.RIGHT,
+
+    # QWERTY fallback
+    pygame.K_w: Direction.TOP,
+    pygame.K_a: Direction.LEFT,
 }
 
 class Player:
@@ -22,7 +23,8 @@ class Player:
         self.__inventory: Inventory = inventory
         self.selected: Direction = None
         self.__luck: float = 1.0
-        self._selection_sprite = pygame.image.load('player.png')
+        self.selection_sprite = pygame.image.load('player.png')
+
     @property
     def luck(self):
         return self.__luck
@@ -43,8 +45,7 @@ class Player:
 
     def add_gems(self, value):
         self.inventory.add_gems(value)
-    
-    
+        
     def add_keys(self, value):
         self.inventory.add_keys(value)
 

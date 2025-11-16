@@ -3,37 +3,10 @@
 import pygame
 import sys
 from src.settings import *
-from src.entities.map import Map
-from src.entities.door import Door
-from src.utils.lock_state import LockState
-from src.utils.direction import Direction
+from src.entities.map import map
 from src.session import session
+from src.entities.choice_menu import menu
 
-
-pool = [
-    {
-        "name": "Antechamber",
-        "price": 0,
-        "doors": [
-            Door(LockState.DOUBLE_LOCKED, Direction.BOTTOM),
-            Door(LockState.DOUBLE_LOCKED, Direction.RIGHT),
-            Door(LockState.DOUBLE_LOCKED, Direction.LEFT),
-        ],
-        "interactables": [],
-        
-    },
-    {
-        "name": "Antechamber",
-        "price": 0,
-        "doors": [
-            Door(LockState.DOUBLE_LOCKED, Direction.BOTTOM),
-            Door(LockState.DOUBLE_LOCKED, Direction.RIGHT),
-            Door(LockState.DOUBLE_LOCKED, Direction.LEFT),
-        ],
-        "interactables": []
-    },
-
-]
 
 # Change to a class HUD
 def draw_info_panel(screen):
@@ -57,10 +30,9 @@ def draw_map_area(screen):
 
 def main():
     pygame.init()
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Blue Prince - Prototype Display")
     clock = pygame.time.Clock()
-    map = Map(0)
+
 
     while True:
         for event in pygame.event.get():
@@ -68,10 +40,17 @@ def main():
                 pygame.quit()
                 sys.exit()
 
+            # MENU INPUT HANDLING
+            menu.handle_event(event, session.player)
+
         # --- Draw everything ---
         screen.fill(DARK_BLUE)
         map.draw(screen)
+        map.update_selected_direction(session.player, screen)
         draw_info_panel(screen)
+
+        # Draw the right menu
+        menu.draw(screen)
 
         pygame.display.flip()
         clock.tick(60)

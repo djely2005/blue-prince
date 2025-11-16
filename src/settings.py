@@ -9,6 +9,10 @@ MAP_WIDTH = int(WIDTH * MAP_RATIO)
 INFO_WIDTH = WIDTH - MAP_WIDTH
 GRID_HEIGHT = 3 # 9
 GRID_WIDTH = 3 # 5
+TILE_SIZE = 64
+OFFSET_X = 20
+OFFSET_Y = 20
+TEXT_WIDTH = 160
 
 # --- Colors ---
 BLUE = (50, 100, 200)
@@ -28,3 +32,5 @@ INFO_LINES = [
     "2. Talk to the guard",
     "3. Check your inventory"
 ]
+
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
