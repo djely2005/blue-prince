@@ -39,9 +39,20 @@ def main():
 
             # Handle room selector first if active
             if room_selector.active:
-                selected_room = room_selector.handle_event(event)
-                if selected_room:
-                    game_map.handle_room_selection(selected_room, session.player)
+                result = room_selector.handle_event(event)
+                if isinstance(result, str) and result == "reroll":
+                    # Handle reroll request
+                    if session.player.inventory.dice.quantity >= room_selector.reroll_cost:
+                        # Deduct dice and get new room choices
+                        session.player.inventory.spend_dice(room_selector.reroll_cost)
+                        # Double the cost for next reroll
+                        room_selector.reroll_cost *= 2
+                        # Re-request room placement with new weighted choices
+                        # We need to store the current door position/direction from the last open_door_callback
+                        # For now, we'll use the player's selected direction and position
+                elif result and result != "reroll":
+                    # Room was selected
+                    game_map.handle_room_selection(result, session.player)
                 continue
 
             # MENU INPUT HANDLING

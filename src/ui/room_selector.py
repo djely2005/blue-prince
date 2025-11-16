@@ -20,6 +20,8 @@ class RoomSelector:
         self.room_choices = []  # List of (room, cost_string) tuples
         self.selected_index = 0
         self.active = False
+        self.reroll_cost = 1  # Starts at 1, doubles each reroll
+        self.reroll_requested = False  # Flag to indicate reroll was requested
 
     def set_choices(self, room_list):
         """
@@ -31,6 +33,8 @@ class RoomSelector:
         self.room_choices = room_list
         self.selected_index = 0
         self.active = True
+        self.reroll_cost = 1  # Reset reroll cost when new choices are set
+        self.reroll_requested = False
 
     def clear(self):
         """Clear choices and deactivate the selector."""
@@ -70,12 +74,25 @@ class RoomSelector:
             screen.blit(text_surface, (x + 10, y))
             y += self.line_height
 
+        # Draw reroll option
+        y += 10
+        reroll_color = (255, 165, 0)  # Orange for reroll
+        reroll_selected = (len(self.room_choices) <= self.selected_index)
+        if reroll_selected:
+            reroll_color = (255, 255, 0)  # Yellow if selected
+        
+        reroll_text = f"[R] Reroll - Cost: {self.reroll_cost} dice"
+        text_surface = self.font.render(reroll_text, True, reroll_color)
+        screen.blit(text_surface, (x + 10, y))
+
     def handle_event(self, event):
         """
         Handle input for room selection.
         
         Returns:
-            Selected room if RETURN pressed, None otherwise
+            - Selected room if RETURN pressed
+            - "reroll" string if reroll is requested
+            - None otherwise
         """
         if not self.active or not self.room_choices:
             return None
@@ -85,6 +102,10 @@ class RoomSelector:
                 self.selected_index = (self.selected_index + 1) % len(self.room_choices)
             elif event.key == pygame.K_UP:
                 self.selected_index = (self.selected_index - 1) % len(self.room_choices)
+            elif event.key == pygame.K_r:
+                # Reroll request
+                self.reroll_requested = True
+                return "reroll"
             elif event.key == pygame.K_RETURN:
                 selected_room = self.room_choices[self.selected_index]
                 self.clear()

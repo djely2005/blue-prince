@@ -12,7 +12,7 @@ class Inventory:
         self.money: ConsumableItem = ConsumableItem('Money', 0, ConsumableType.MONEY)
         self.gems: ConsumableItem = ConsumableItem('Gems', 0, ConsumableType.GEM)
         self.keys: ConsumableItem = ConsumableItem('keys', 0, ConsumableType.KEY)
-        self.dice: ConsumableItem = ConsumableItem('Dice', 0, ConsumableType.DICE)
+        self.dice: ConsumableItem = ConsumableItem('Dice', 20, ConsumableType.DICE)
         # Keep constructor minimal; avoid side-effects here.
     # Needs to be private
 
@@ -57,6 +57,17 @@ class Inventory:
     
     def add_money(self, n: int):
         self.money.quantity += n
+
+    def spend_dice(self, n: int) -> bool:
+        """Consume `n` dice if available. Return True if spent, False otherwise."""
+        if self.dice.quantity >= n:
+            self.dice.quantity -= n
+            return True
+        return False
+
+    def add_dice(self, n: int) -> None:
+        self.dice.quantity += n
+
     # I wanted to add a method that verify if the player had a permanent item
     # The purpose of LaundryRoom is trading money, keys or gems
     # This method shouldn't be here

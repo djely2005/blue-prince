@@ -67,3 +67,9 @@ class Player:
     
     def spend_keys(self, value):
         self.inventory.spend_keys(value)
+
+    def add_dice(self, value):
+        self.inventory.add_dice(value)
+
+    def spend_dice(self, value):
+        self.inventory.spend_dice(value)
