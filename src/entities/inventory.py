@@ -16,7 +16,9 @@ class Inventory:
         # Keep constructor minimal; avoid side-effects here.
     # Needs to be private
 
-
+    def add_permanent_item(self, value: PermanentItem):
+        value.on_enter_inventory()
+        self.permanentItems.append(value)
     # Let's keep the method for later
     # We use clear verbs and explicit intent.
     def spend_steps(self, n: int) -> None:

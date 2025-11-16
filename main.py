@@ -69,7 +69,7 @@ def main():
                             elif itm.type.name == 'DICE':
                                 inv.add_dice(itm.quantity)
                         else:
-                            inv.permanentItems.append(itm)
+                            inv.add_permanent_item(itm)
                             si.mark_owned(True)
 
                     return cb
