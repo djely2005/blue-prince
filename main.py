@@ -64,9 +64,10 @@ def main():
         game_map.update_selected_direction(session.player, screen)
         game_map.draw_player_position(screen, session.player)
         
-        # Draw HUD or room selector
+        # Draw HUD or room selector (pass current room into selector)
+        current_room = game_map.grid[session.player.grid_position[0]][session.player.grid_position[1]]
         if room_selector.active:
-            room_selector.draw(screen)
+            room_selector.draw(screen, current_room)
         else:
             hud.draw(screen, session.player)
 

@@ -42,8 +42,13 @@ class RoomSelector:
         self.selected_index = 0
         self.active = False
 
-    def draw(self, screen: pygame.Surface):
-        """Draw the room selector panel."""
+    def draw(self, screen: pygame.Surface, current_room=None):
+        """Draw the room selector panel and show current player's room.
+
+        Args:
+            screen: pygame Surface to draw on
+            current_room: optional Room instance representing where the player is
+        """
         if not self.active or not self.room_choices:
             return
 
@@ -64,23 +69,32 @@ class RoomSelector:
         # Title
         title = self.font.render("SELECT ROOM", True, DARK_BLUE)
         screen.blit(title, (x, y))
-        y += self.line_height + 5
+        y += self.line_height + 2
+
+        # Current room display
+        if current_room is not None:
+            cur_text = f"Current: {getattr(current_room, 'name', 'Unknown')}"
+            cur_surf = self.font.render(cur_text, True, (0, 0, 0))
+            screen.blit(cur_surf, (x + 6, y))
+            y += self.line_height + 4
+        else:
+            y += self.line_height + 2
 
         # Draw room choices
         for i, room in enumerate(self.room_choices):
             color = (255, 255, 0) if i == self.selected_index else (0, 0, 0)
-            cost_text = f"- {room.name} (Cost: {room.price} gems)"
+            cost_text = f"{i+1}. {room.name} (Cost: {room.price} gems)"
             text_surface = self.font.render(cost_text, True, color)
             screen.blit(text_surface, (x + 10, y))
             y += self.line_height
 
         # Draw reroll option
-        y += 10
+        y += 6
         reroll_color = (255, 165, 0)  # Orange for reroll
         reroll_selected = (len(self.room_choices) <= self.selected_index)
         if reroll_selected:
             reroll_color = (255, 255, 0)  # Yellow if selected
-        
+
         reroll_text = f"[R] Reroll - Cost: {self.reroll_cost} dice"
         text_surface = self.font.render(reroll_text, True, reroll_color)
         screen.blit(text_surface, (x + 10, y))
