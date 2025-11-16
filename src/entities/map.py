@@ -430,6 +430,7 @@ class Map:
             # non-fatal: if event classes aren't available, skip event spawning
             pass
 
+        new_room.on_draft(player)
         new_room.on_enter(player)
 
         # If this room is the Antechamber, the player wins the game
@@ -648,6 +649,7 @@ class Map:
 
         # Move the player
         player.grid_position = (new_r, new_c)
+        target_room.on_enter(player)
         player.spend_steps(1)
         return True
 

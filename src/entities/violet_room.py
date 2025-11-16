@@ -57,6 +57,29 @@ class Bedroom(VioletRoom):
     def shop(self, player, choice: str):
         return super().shop(player, choice)
 
+class GuestBedroom(VioletRoom):
+    def __init__(self):
+        name = "Guest bedroom"
+        price = 0
+        doors=[Door(LockState.UNLOCKED, Direction.BOTTOM), Door(LockState.UNLOCKED, Direction.LEFT)]
+        rarity=Rarity.COMMON
+        sprite_path="rooms/Guest_Bedroom.png"
+        possible_items = [
+                            (0.4, ConsumableItem, {'name': 'Gold', 'quantity': 3}),
+                            (0.3, OtherItem, {'name': 'Apple', 'quantity': 1}),
+                            (0.2, ConsumableItem, {'name': 'Gem', 'quantity': 1}),
+                            (0.15, ConsumableItem, {'name': 'Die', 'quantity': 1}),
+                            (0.15, ConsumableItem, {'name': 'Key', 'quantity': 1})
+        ]
+        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path= sprite_path)
+    def on_draft(self, player):
+        player.add_steps(10)
+        return super().on_draft(player)
+
+    def on_enter(self, player: Player):
+        return super().on_enter(player)
+    def shop(self, player, choice: str):
+        return super().shop(player, choice)
 
 class Boudoir(VioletRoom):
     def __init__(self):
