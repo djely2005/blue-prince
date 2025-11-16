@@ -39,7 +39,7 @@ class Chapel(RedRoom):
     def __init__(self):
         name="Chapel" 
         price=0
-        doors=[Door(LockState.UNLOCKED, Direction.BOTTOM)]
+        doors=[Door(LockState.UNLOCKED, Direction.BOTTOM), Door(LockState.UNLOCKED, Direction.RIGHT), Door(LockState.UNLOCKED, Direction.LEFT)]
         rarity=Rarity.COMMON
         sprite_path="rooms/Chapel.png"
         possible_items = []
@@ -67,6 +67,7 @@ class Gymnasium(RedRoom):
 
     def on_enter(self, player):
         player.spend_steps(2)
+        return super().on_enter(player)
     
     def on_draft(self, player):
         return super().on_draft(player)
