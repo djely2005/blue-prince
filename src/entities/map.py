@@ -156,3 +156,12 @@ class Map:
                     door.direction = Direction.TOP
 
         return room
+    
+    def align_room(self, room: Room, needed_direction: Direction):
+        """Rotate room so that one door matches the needed direction"""
+        for _ in range(4):
+            if any(door.direction == needed_direction for door in room.doors):
+                return room
+            self.rotate_room(room, 1)
+
+        return room
