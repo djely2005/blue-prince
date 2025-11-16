@@ -130,8 +130,6 @@ class Map:
             return LockState.LOCKED
         else: # 30% chances to have an UNLOCKED
             return LockState.UNLOCKED
-        
-    # (Dans la classe Map de map.py)
 
     def prepare_room_doors(self, room_template: Room, row_index: int):
         """ Modify the lock state of a room's door"""
@@ -143,3 +141,18 @@ class Map:
             door.lock_state = new_lock_state
         
         return room_template
+    
+    def rotate_room(self, room: Room, rotations: int):
+        """Rotate a room following a clockwise direction (sens des aiguilles d'une montre)"""
+        for _ in range(rotations):
+            for door in room.doors:
+                if door.direction == Direction.TOP:
+                    door.direction = Direction.RIGHT
+                elif door.direction == Direction.RIGHT:
+                    door.direction = Direction.BOTTOM
+                elif door.direction == Direction.BOTTOM:
+                    door.direction = Direction.LEFT
+                elif door.direction == Direction.LEFT:
+                    door.direction = Direction.TOP
+
+        return room
