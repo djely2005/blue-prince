@@ -4,8 +4,10 @@ from abc import abstractmethod
 from src.entities.player import Player
 from src.utils.rarity import Rarity
 from src.entities.other_item import OtherItem
+from src.entities.shovel import Shovel
 from src.entities.permanent_item import PermanentItem
 from src.entities.consumable_item import ConsumableItem
+from src.entities.consumable_item import ConsumableType
 from src.entities.bunny_paw import BunnyPaw
 from src.utils.lock_state import LockState
 from src.utils.direction import Direction
@@ -20,12 +22,12 @@ possible_items = {
         (0.40, ConsumableItem, {'name': 'Gem', 'quantity': 1}),
         (0.35, ConsumableItem, {'name': 'Gem', 'quantity': 2}),
         (0.30, ConsumableItem, {'name': 'Gold', 'quantity': 2}),
-        (0.20, PermanentItem, {'name': 'Shovel', 'quantity': 3})
+        (0.20, Shovel, {'name': 'Shovel', 'quantity': 3})
         # the first number is for probability I just did a random number we can change it later if needed
     ],
     "Veranda": [
         (0.50, ConsumableItem, {'name': 'Gem', 'quantity': 1}),
-        (0.35, PermanentItem, {'name': 'Shovel', 'quantity': 1})
+        (0.35, Shovel, {'name': 'Shovel', 'quantity': 1})
     ]
 
 }
@@ -76,12 +78,12 @@ class Terrace(GreenRoom):
         rarity = Rarity.COMMON
         sprite_path = "rooms/Terrace.png"
         possible_items =[
-                            (0.50, OtherItem, {'name': 'Banana', 'quantity': 1}),
-                            (0.45, OtherItem, {'name': 'Orange', 'quantity': 1}),
-                            (0.40, ConsumableItem, {'name': 'Gem', 'quantity': 1}),
-                            (0.35, ConsumableItem, {'name': 'Gem', 'quantity': 2}),
-                            (0.30, ConsumableItem, {'name': 'Gold', 'quantity': 2}),
-                            (0.20, PermanentItem, {'name': 'Shovel', 'quantity': 3}),
+                            (0.50, OtherItem, {'name': 'Banana', 'quantity': 1, 'type': ConsumableType.STEP}),
+                            (0.45, OtherItem, {'name': 'Orange', 'quantity': 1, 'type': ConsumableType.STEP}),
+                            (0.40, ConsumableItem, {'name': 'Gem', 'quantity': 1, 'type': ConsumableType.GEM}),
+                            (0.35, ConsumableItem, {'name': 'Gem', 'quantity': 2, 'type': ConsumableType.GEM}),
+                            (0.30, ConsumableItem, {'name': 'Gold', 'quantity': 2, 'type': ConsumableType.MONEY}),
+                            (0.20, Shovel, {}),
         ]
         super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path= sprite_path)
 
@@ -102,8 +104,8 @@ class Veranda(GreenRoom):
         rarity = Rarity.UNUSUAL
         sprite_path = "rooms/Veranda.png"
         possible_items = [
-                            (0.50, ConsumableItem, {'name': 'Gem', 'quantity': 1}),
-                            (0.35, PermanentItem, {'name': 'Shovel', 'quantity': 1})
+                            (0.50, ConsumableItem, {'name': 'Gem', 'quantity': 1, 'type': ConsumableType.GEM}),
+                            (0.35, Shovel, {})
         ]
         super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path= sprite_path)
 

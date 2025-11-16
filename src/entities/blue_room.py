@@ -19,10 +19,10 @@ class BlueRoom(Room):
         """Generic item discovery: based on player luck, some possible_items become available.
         Called by on_draft in subclasses that have possible_items defined.
         """
-        if not self.possible_item:
+        if not self.possible_items:
             return
         
-        for item_tuple in self.possible_item:
+        for item_tuple in self.possible_items:
             # Handle both formats: (probability, class, kwargs) and direct objects
             if isinstance(item_tuple, tuple) and len(item_tuple) >= 3:
                 probability, item_class, init_kwargs = item_tuple[0], item_tuple[1], item_tuple[2]
