@@ -127,34 +127,35 @@ class Room(ABC):
 
 
         
-    
-    def draw(self, screen: pygame.Surface, pos: tuple[int, int], size: int):
-        """
-            Draw the sprite of the room
-        """
-        x, y = pos
-        rect = pygame.Rect(x, y, size, size)
+  
+      def draw(self, screen: pygame.Surface, pos: tuple[int, int], size: int):
+    """
+    Draw the sprite of the room inside a size x size tile at position pos.
+    """
+    x, y = pos
+    rect = pygame.Rect(x, y, size, size)
 
-        # Image logic
-        if self.__sprite:
-            scale_sprite = pygame.transform.scale(self.__sprite, (size, size))
-            rotation_steps = getattr(self, '_Room__rotation', 0)
-            if rotation_steps:
-                # pygame.transform.rotate uses degrees counter-clockwise, so negative for clockwise
-                angle = -90 * (rotation_steps + 1)
-                rotated = pygame.transform.rotate(scale_sprite, angle)
-                # keep rotated image centered in the tile
-                rotated_rect = rotated.get_rect(center=(x + size // 2, y + size // 2))
-                screen.blit(rotated, rotated_rect.topleft)
-            else:
-                screen.blit(scale_sprite, (x, y))
+    if self.__sprite:
+        # scale to tile size
+        scaled = pygame.transform.scale(self.__sprite, (size, size))
+
+        # rotation_steps: 0..3, stored in _Room__rotation
+        rotation_steps = getattr(self, "_Room__rotation", 0)
+        if rotation_steps:
+            # clockwise 90° per step → negative angle for pygame (CCW)
+            angle = -90 * rotation_steps
+            rotated = pygame.transform.rotate(scaled, angle)
+            rotated_rect = rotated.get_rect(center=(x + size // 2, y + size // 2))
+            screen.blit(rotated, rotated_rect.topleft)
         else:
-            # Base color (you can change based on rarity or price)
-            pygame.draw.rect(screen, (200, 200, 200), rect)
-        
-        pygame.draw.rect(screen, (50, 50, 50), rect, 2) # contour?
+            screen.blit(scaled, (x, y))
+    else:
+        # fallback if sprite not loaded
+        pygame.draw.rect(screen, (200, 200, 200), rect)
 
-        # Draw doors (optional)
+    # border
+    pygame.draw.rect(screen, (50, 50, 50), rect, 2)
+
 
 
     
