@@ -1,14 +1,4 @@
-from src.entities.room import Room
-from src.entities.door import Door
-from abc import abstractmethod
-from src.entities.player import Player
-from src.utils.rarity import Rarity
-from src.entities.other_item import OtherItem
-from src.entities.permanent_item import PermanentItem
-from src.entities.consumable_item import ConsumableItem
-from src.entities.bunny_paw import BunnyPaw
-from src.utils.lock_state import LockState
-from src.utils.direction import Direction
+
 
 from src.entities.room import Room
 from src.entities.door import Door
@@ -18,7 +8,8 @@ from src.utils.rarity import Rarity
 from src.entities.other_item import OtherItem
 from src.entities.permanent_item import PermanentItem
 from src.entities.consumable_item import ConsumableItem
-from src.entities.bunny_paw import BunnyPaw
+from src.utils.consumable_type import ConsumableType
+from src.entities.shovel import Shovel
 from src.utils.lock_state import LockState
 from src.utils.direction import Direction
 from src.session import session
@@ -84,12 +75,12 @@ class Hallway(OrangeRoom):
         rarity=Rarity.COMMON
         sprite_path = "rooms/Hallway.png"
         possible_items =[
-                            (0.50, OtherItem, {'name': 'Banana', 'quantity': 1}),
-                            (0.45, OtherItem, {'name': 'Orange', 'quantity': 1}),
-                            (0.40, ConsumableItem, {'name': 'Gem', 'quantity': 1}),
-                            (0.35, ConsumableItem, {'name': 'Gem', 'quantity': 2}),
-                            (0.30, ConsumableItem, {'name': 'Gold', 'quantity': 2}),
-                            (0.20, PermanentItem, {'name': 'Shovel', 'quantity': 3})
+                            (0.50, OtherItem, {'name': 'Banana', 'quantity': 1, 'type': ConsumableType.STEP}),
+                            (0.45, OtherItem, {'name': 'Orange', 'quantity': 1, 'type': ConsumableType.STEP}),
+                            (0.40, ConsumableItem, {'name': 'Gem', 'quantity': 1, 'type': ConsumableType.GEM}),
+                            (0.35, ConsumableItem, {'name': 'Gem', 'quantity': 2, 'type':  ConsumableType.GEM}),
+                            (0.30, ConsumableItem, {'name': 'Gold', 'quantity': 2, 'type':  ConsumableType.MONEY}),
+                            (0.20, Shovel, {})
         ]
         super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path= sprite_path)
 
@@ -110,8 +101,8 @@ class Passageway(OrangeRoom):
         rarity=Rarity.COMMON
         sprite_path = "rooms/Passageway.webp"
         possible_items = [
-                            (0.50, ConsumableItem, {'name': 'Gem', 'quantity': 1}),
-                            (0.35, PermanentItem, {'name': 'Shovel', 'quantity': 1})
+                            (0.50, ConsumableItem, {'name': 'Gem', 'quantity': 1, 'type': ConsumableType.GEM}),
+                            (0.35, Shovel, {})
         ]
         super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path= sprite_path)
 

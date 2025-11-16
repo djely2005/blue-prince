@@ -16,21 +16,22 @@ class BlueRoom(Room):
         super().__init__(name, price, doors, rarity, session, possible_items= possible_items, img_path = img_path)
 
     def discover_items(self, player):
-        """Generic item discovery: based on player luck, some possible_items become available.
-        Called by on_draft in subclasses that have possible_items defined.
         """
-        if not self.possible_items:
-            return
-        
-        for item_tuple in self.possible_items:
-            # Handle both formats: (probability, class, kwargs) and direct objects
-            if isinstance(item_tuple, tuple) and len(item_tuple) >= 3:
-                probability, item_class, init_kwargs = item_tuple[0], item_tuple[1], item_tuple[2]
-                # Adjust probability by player luck
-                final_prob = probability * max(0.1, player.luck)
-                if session.random.random() < final_prob:
-                    new_item = item_class(**init_kwargs)
-                    player.inventory.otherItems.append(new_item)
+        Samples items from possible_items based on player luck.
+        Luck increases probability of discovering items (minimum 10%).
+        """
+        for probability, item_class, kwargs in self.possible_items:
+            # Adjust probability by player luck (multiplier between 0.1 and 1.0)
+            final_prob = probability * max(0.1, player.luck)
+            if self._room_random.random() < final_prob:
+                # Create the item and add to inventory
+                item = item_class(**kwargs)
+                if hasattr(item, 'type') and hasattr(item.type, 'name'):
+                    # ConsumableItem: add to otherItems
+                    self.available_items.append(item)
+                else:
+                    # PermanentItem or OtherItem: add accordingly
+                    self.available_items.append(item)
 
     @abstractmethod
     def on_enter(self, player):

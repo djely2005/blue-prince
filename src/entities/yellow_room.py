@@ -91,7 +91,7 @@ class LaundryRoom(YellowRoom):
     - Service C: Exchange ALL Keys with ALL Gold at 1:1 for cost 10 money
     """
     def __init__(self, name: str = 'Laundry Room', price: int = 0, doors: list[Door] = None, rarity: Rarity = Rarity.RARE, img_path: str = 'rooms/Laundry_Room.png'):
-        doors = doors or [Door(LockState.DOUBLE_LOCKED, Direction.BOTTOM)]
+        doors = doors or [Door(LockState.DOUBLE_LOCKED, Direction.BOTTOM), Door(LockState.DOUBLE_LOCKED, Direction.LEFT)]
         super().__init__(name, price, doors, rarity, possible_items=[], img_path=img_path)
 
     def on_draft(self, player: Player):
@@ -107,7 +107,7 @@ class LaundryRoom(YellowRoom):
         # Service C: Keys -> Gold (swap all keys into money at 1:1) cost 10 money
         services.append(ShopItem({'service': 'keys_to_money', 'desc': 'Exchange ALL Keys with ALL Gold at 1:1'}, 10))
 
-        self.possible_item = services
+        self.possible_items = services
         return super().on_enter(player)
 
     def perform_service(self, player: Player, service_key: str) -> bool:
