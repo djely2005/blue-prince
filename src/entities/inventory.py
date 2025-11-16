@@ -94,8 +94,6 @@ class Inventory:
         """Use/consume an OtherItem. Returns a message about the effect.
         Handles ConsumableItems and OtherItems based on their type.
         """
-        if item not in self.otherItems:
-            return "Item not found"
         
         # Get the item's type and quantity
         bonus = getattr(item, 'quantity', 5)
@@ -123,5 +121,4 @@ class Inventory:
             self.add_steps(bonus)
             msg = f"Used {item.name}! Gained {bonus} steps."
         
-        self.otherItems.remove(item)
         return msg

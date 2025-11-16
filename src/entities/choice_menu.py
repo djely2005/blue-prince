@@ -9,11 +9,11 @@ class ChoiceMenu:
         self.rect = pygame.Rect(rect)
         self.font = font
         self.choices = choices
-        self.selected_index = 0
+        self.other_items_rects = []
         # Do not create fonts at import time; if `font` is None, defer
         # creating a default font until draw time (after pygame.init()).
 
-    def draw(self, screen):
+    def draw(self, screen, current_room):
         # Ensure a default font exists (creates it lazily after pygame init)
         if self.font is None:
             try:
@@ -29,6 +29,21 @@ class ChoiceMenu:
         title = pygame.font.Font(None, 26).render("MENU", True, (255, 215, 0))
         screen.blit(title, (x, y))
         y += 35
+        # OtherItems (consumables)
+        if len(current_room.available_items):
+            y += 8
+            other_title = self.font.render("CONSUMABLES:", True, DARK_BLUE)
+            screen.blit(other_title, (x, y))
+            y += 32
+
+            self.other_items_rects = []
+            print('test')
+            for item in current_room.available_items:
+                item_text = self.font.render(f"- {item.name} (click to use)", True, (100, 200, 100))
+                item_rect = item_text.get_rect(topleft=(x + 10, y))
+                self.other_items_rects.append((item_rect, item))
+                screen.blit(item_text, (x + 10, y))
+                y += 32
 
         for i, (label, _) in enumerate(self.choices):
             color = (255, 255, 0) if i == self.selected_index else (200, 200, 200)
@@ -63,7 +78,12 @@ class ChoiceMenu:
                 if 0 <= self.selected_index < n:
                     _, callback = self.choices[self.selected_index]
                     callback(player)     # <<< execute chosen action
-
+    def handle_click(self, pos: tuple) -> 'OtherItem | None':
+            """Check if click is on a consumable item and return it. Otherwise return None."""
+            for item_rect, item in self.other_items_rects:
+                if item_rect.collidepoint(pos):
+                    return item
+            return None
 
 menu = ChoiceMenu(
         rect=(MAP_WIDTH + 10, 150, INFO_WIDTH - 20, 500),

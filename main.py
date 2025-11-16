@@ -127,10 +127,27 @@ def main():
             direction_name = direction.name.capitalize()
             menu.choices.append((f"Go {direction_name} ({room.name})", lambda player, d=direction: game_map.move_to_adjacent_room(player, d)))
 
-        # If current room has an event, show an interact option
+        # If current room has an event or consuamable, show an interact option
         if not room_selector.active:
             current_room = game_map.grid[session.player.grid_position[0]][session.player.grid_position[1]]
             evt = getattr(current_room, 'event', None)
+            cons = getattr(current_room, 'available_items', None)
+            if cons is not None:
+                def make_cons_cb(e):
+                    def cb(player):
+                        try:
+                            res = e.open(player)
+                        except Exception as exc:
+                            hud.show_message(f"Error: {exc}", 3.0)
+                            return
+                        # Expect (success: bool, message: str, reward: dict)
+                        if isinstance(res, tuple) and len(res) >= 2:
+                            success, msg = res[0], res[1]
+                        else:
+                            success, msg = False, 'Nothing happened'
+                        hud.show_message(msg, 3.0)
+
+                    return cb
             if evt is not None and not getattr(evt, 'opened', False):
                 # Add menu choice to interact/open the event
                 def make_event_cb(e):
@@ -158,9 +175,10 @@ def main():
 
             # Handle HUD click for consuming OtherItems
             if event.type == pygame.MOUSEBUTTONDOWN and not room_selector.active:
-                clicked_item = hud.handle_click(event.pos)
+                clicked_item = menu.handle_click(event.pos)
                 if clicked_item is not None:
                     msg = session.player.inventory.use_other_item(clicked_item)
+                    current_room.available_items.remove(clicked_item)
                     hud.show_message(msg, 3.0)
                     continue
 
@@ -202,14 +220,15 @@ def main():
         if room_selector.active:
             room_selector.draw(screen, current_room)
         else:
-            hud.draw(screen, session.player)
+            hud.draw(screen, session.player, current_room)
 
         
         
 
         # Draw the right menu (always draw unless in room selector mode)
         if not room_selector.active:
-            menu.draw(screen)
+            print('test: ', current_room.available_items)
+            menu.draw(screen, current_room)
 
         # Check for losing condition: steps reached zero
         if session.player.inventory.steps.quantity <= 0 and not getattr(game_map, 'game_over', False):
