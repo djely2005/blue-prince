@@ -67,10 +67,10 @@ class Room(ABC):
         return self.__available_items
 
     @property
-    def possible_item(self):
+    def possible_items(self):
         return self.__possible_items
-    @possible_item.setter
-    def possible_item(self, value):
+    @possible_items.setter
+    def possible_items(self, value):
         self.__possible_items = value
     
     @abstractmethod

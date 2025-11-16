@@ -39,7 +39,14 @@ class Commissary(YellowRoom):
     """
     def __init__(self, name: str = "Commissary", price: int = 0, doors: list[Door] = None, rarity: Rarity = Rarity.STANDARD, img_path: str = 'rooms/Commissary.webp'):
         doors = doors or [Door(LockState.LOCKED, Direction.BOTTOM), Door(LockState.LOCKED, Direction.LEFT)]
-        super().__init__(name, price, doors, rarity, possible_items=[], img_path=img_path)
+        super().__init__(name, price, doors, rarity, possible_items=[
+            (Shovel, 'Shovel', 10),
+            (MetalDetector, 'Metal Detector', 30),
+            (LockPick, 'Lock Pick', 20),
+            (Hammer, 'Hammer', 15),
+            (BunnyPaw, 'Bunny Paw', 25),
+
+        ], img_path=img_path)
 
     def on_draft(self, player: Player):
         # Build a deterministic dynamic shop inventory based on player.luck
@@ -49,15 +56,8 @@ class Commissary(YellowRoom):
         luck = max(0.0, getattr(player, 'luck', 1.0))
         count = min(5, max(1, 1 + int(luck)))
 
-        candidates = [
-            (Shovel, 'Shovel', 10),
-            (MetalDetector, 'Metal Detector', 30),
-            (LockPick, 'Lock Pick', 20),
-            (Hammer, 'Hammer', 15),
-            (BunnyPaw, 'Bunny Paw', 25),
-        ]
 
-        pool = list(candidates)
+        pool = list(self.possible_item)
         offers = []
         for _ in range(count):
             if not pool:

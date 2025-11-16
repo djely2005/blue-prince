@@ -4,6 +4,7 @@ from abc import abstractmethod
 from src.entities.player import Player
 from src.utils.rarity import Rarity
 from src.entities.consumable_item import ConsumableItem
+from src.entities.consumable_item import ConsumableType
 from src.utils.lock_state import LockState
 from src.utils.direction import Direction
 from src.session import session
@@ -13,8 +14,8 @@ from src.session import session
 possible_items = {
     "Lavatory": [],
     "Gymnasium": [
-        (0.10, ConsumableItem, {'name': 'Gold', 'quantity': 3}),
-        (0.05, ConsumableItem, {'name': 'Key', 'quantity': 1})
+        (0.10, ConsumableItem, {'name': 'Gold', 'quantity': 3, 'type': ConsumableType.MONEY}),
+        (0.05, ConsumableItem, {'name': 'Key', 'quantity': 1, 'type': ConsumableType.KEY})
     ]
 
 }
@@ -22,7 +23,7 @@ possible_items = {
 class RedRoom(Room):
     def __init__(self, name: str, price: int, doors: list[Door], rarity: Rarity, possible_items = [], img_path: str = ''):
         super().__init__(name, price, doors, rarity, session, possible_items= possible_items, img_path= img_path)
-            
+        self.possible_items = possible_items
     @abstractmethod
     def on_enter(self, player):
         return super().on_enter(player)
@@ -30,9 +31,28 @@ class RedRoom(Room):
     @abstractmethod
     def on_draft(self, player):
         return super().on_draft(player)
-    
+
     def apply_effect(self, player: Player):
         pass
+    
+    def discover_items(self, player: Player):
+        """
+        Samples items from possible_items based on player luck.
+        Luck increases probability of discovering items (minimum 10%).
+        """
+        for probability, item_class, kwargs in self.possible_items:
+            # Adjust probability by player luck (multiplier between 0.1 and 1.0)
+            final_prob = probability * max(0.1, player.luck)
+            if self._room_random.random() < final_prob:
+                # Create the item and add to inventory
+                item = item_class(**kwargs)
+                if hasattr(item, 'type') and hasattr(item.type, 'name'):
+                    # ConsumableItem: add to otherItems
+                    player.inventory.otherItems.append(item)
+                else:
+                    # PermanentItem or OtherItem: add accordingly
+                    if hasattr(player.inventory, 'otherItems'):
+                        player.inventory.otherItems.append(item)
 
 
 class Chapel(RedRoom):
@@ -44,13 +64,12 @@ class Chapel(RedRoom):
         sprite_path="rooms/Chapel.png"
         possible_items = []
         super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path= sprite_path)
-
     def on_enter(self, player):
         player.spend_money(1)
         return super().on_enter(player)
     
     def on_draft(self, player):
-        return super().on_draft(player)
+        self.discover_items(player)
 
 class Gymnasium(RedRoom):
     def __init__(self):
@@ -60,8 +79,8 @@ class Gymnasium(RedRoom):
         rarity=Rarity.STANDARD
         sprite_path="rooms/Gymnasium.png"
         possible_items = [
-                            (0.10, ConsumableItem, {'name': 'Gold', 'quantity': 3}),
-                            (0.05, ConsumableItem, {'name': 'Key', 'quantity': 1})
+            (0.10, ConsumableItem, {'name': 'Gold', 'quantity': 3, 'type': ConsumableType.MONEY}),
+            (0.05, ConsumableItem, {'name': 'Key', 'quantity': 1, 'type': ConsumableType.KEY})
         ]
         super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path= sprite_path)
 
@@ -70,4 +89,4 @@ class Gymnasium(RedRoom):
         return super().on_enter(player)
     
     def on_draft(self, player):
-        return super().on_draft(player)
+        self.discover_items(player)

@@ -48,6 +48,25 @@ class GreenRoom(Room):
 
     def apply_effect(self, player: Player):
         pass
+    
+    def discover_items(self, player: Player):
+        """
+        Samples items from possible_items based on player luck.
+        Luck increases probability of discovering items (minimum 10%).
+        """
+        for probability, item_class, kwargs in self.possible_items:
+            # Adjust probability by player luck (multiplier between 0.1 and 1.0)
+            final_prob = probability * max(0.1, player.luck)
+            if self._room_random.random() < final_prob:
+                # Create the item and add to inventory
+                item = item_class(**kwargs)
+                if hasattr(item, 'type') and hasattr(item.type, 'name'):
+                    # ConsumableItem: add to otherItems
+                    player.inventory.otherItems.append(item)
+                else:
+                    # PermanentItem or OtherItem: add accordingly
+                    if hasattr(player.inventory, 'otherItems'):
+                        player.inventory.otherItems.append(item)
 
 class Terrace(GreenRoom):
     def __init__(self):
@@ -70,7 +89,7 @@ class Terrace(GreenRoom):
         pass
     
     def on_draft(self, player):
-        pass
+        self.discover_items(player)
     
     def shop(self, player, choice: str):
         return super().shop(player, choice)
@@ -92,7 +111,7 @@ class Veranda(GreenRoom):
         pass
     
     def on_draft(self, player):
-        pass
+        self.discover_items(player)
 
     def shop(self, player, choice: str):
         return super().shop(player, choice)

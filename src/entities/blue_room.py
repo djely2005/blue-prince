@@ -15,6 +15,23 @@ class BlueRoom(Room):
         # Keep session passed through to Room; BlueRoom adds no extra state currently
         super().__init__(name, price, doors, rarity, session, possible_items= possible_items, img_path = img_path)
 
+    def discover_items(self, player):
+        """Generic item discovery: based on player luck, some possible_items become available.
+        Called by on_draft in subclasses that have possible_items defined.
+        """
+        if not self.possible_item:
+            return
+        
+        for item_tuple in self.possible_item:
+            # Handle both formats: (probability, class, kwargs) and direct objects
+            if isinstance(item_tuple, tuple) and len(item_tuple) >= 3:
+                probability, item_class, init_kwargs = item_tuple[0], item_tuple[1], item_tuple[2]
+                # Adjust probability by player luck
+                final_prob = probability * max(0.1, player.luck)
+                if session.random.random() < final_prob:
+                    new_item = item_class(**init_kwargs)
+                    player.inventory.otherItems.append(new_item)
+
     @abstractmethod
     def on_enter(self, player):
         return super().on_enter(player)
@@ -46,7 +63,7 @@ class EntranceHall(BlueRoom):
         self.visited = True
     
     def on_draft(self, player):
-        pass
+        self.discover_items(player)
     
     def shop(self, player, choice: str):
         return super().shop(player, choice)
@@ -61,7 +78,10 @@ class Parlor(BlueRoom):
             Door(LockState.DOUBLE_LOCKED, Direction.LEFT),
         ]
         rarity = Rarity.COMMON
-        possible_items = [] # To define
+        possible_items = [
+            (0.4, ConsumableItem, {'name': 'Gold', 'quantity': 3, 'type': ConsumableType.MONEY}),
+            (0.3, ConsumableItem, {'name': 'Apple', 'quantity': 3, 'type': ConsumableType.STEP}),
+        ]
         super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path='rooms/Parlor.webp')
     
     def on_enter(self, player: Player):
@@ -69,7 +89,7 @@ class Parlor(BlueRoom):
         self.visited = True
     
     def on_draft(self, player):
-        pass
+        self.discover_items(player)
     
     def shop(self, player, choice: str):
         return super().shop(player, choice)
@@ -85,7 +105,10 @@ class Nook(BlueRoom):
             Door(LockState.DOUBLE_LOCKED, Direction.LEFT),
         ]
         rarity = Rarity.COMMON
-        possible_items = [] # To define
+        possible_items = [
+            (0.5, ConsumableItem, {'name': 'Banana', 'quantity': 2, 'type': ConsumableType.STEP}),
+            (0.3, ConsumableItem, {'name': 'Gold', 'quantity': 2, 'type': ConsumableType.MONEY}),
+        ]
         super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path='rooms/Nook.png')
     
     def on_enter(self, player: Player):
@@ -96,7 +119,7 @@ class Nook(BlueRoom):
         self.visited = True
     
     def on_draft(self, player):
-        return super().on_draft(player)
+        self.discover_items(player)
     
     def shop(self, player, choice):
         return super().shop(player, choice)
@@ -113,7 +136,10 @@ class Den(BlueRoom):
             Door(LockState.DOUBLE_LOCKED, Direction.RIGHT)
         ]
         rarity = Rarity.COMMON
-        possible_items = []
+        possible_items = [
+            (0.4, ConsumableItem, {'name': 'Orange', 'quantity': 5, 'type': ConsumableType.STEP}),
+            (0.3, ConsumableItem, {'name': 'Gold', 'quantity': 2, 'type': ConsumableType.MONEY}),
+        ]
         super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path='rooms/Den.webp')
     
     def on_enter(self, player: Player):
@@ -124,7 +150,7 @@ class Den(BlueRoom):
         self.visited = True
     
     def on_draft(self, player):
-        return super().on_draft(player)
+        self.discover_items(player)
     
     def shop(self, player, choice: str):
         return super().shop(player, choice)
@@ -170,7 +196,7 @@ class Pantry(BlueRoom):
         self.visited = True
     
     def on_draft(self, player):
-        return super().on_draft(player)
+        self.discover_items(player)
     
     def shop(self, player, choice: str):
         return super().shop(player, choice)
@@ -186,7 +212,10 @@ class Antechamber(BlueRoom):
             Door(LockState.DOUBLE_LOCKED, Direction.RIGHT),
         ]
         rarity = Rarity.COMMON
-        possible_items = [] # To define
+        possible_items = [
+            (0.5, ConsumableItem, {'name': 'Gold', 'quantity': 5, 'type': ConsumableType.MONEY}),
+            (0.4, ConsumableItem, {'name': 'Gem', 'quantity': 2, 'type': ConsumableType.GEM}),
+        ]
         super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path='rooms/Antechamber.webp')
     
     def on_enter(self, player: Player):
@@ -194,7 +223,7 @@ class Antechamber(BlueRoom):
         pass
     
     def on_draft(self, player):
-        pass
+        self.discover_items(player)
     
     def shop(self, player, choice: str):
         return super().shop(player, choice)
@@ -208,7 +237,11 @@ class Closet(BlueRoom):
             Door(LockState.DOUBLE_LOCKED, Direction.BOTTOM),
         ]
         rarity = Rarity.COMMON
-        possible_items = [] # To define
+        possible_items = [
+            (0.6, ConsumableItem, {'name': 'Apple', 'quantity': 2, 'type': ConsumableType.STEP}),
+            (0.5, ConsumableItem, {'name': 'Gold', 'quantity': 1, 'type': ConsumableType.MONEY}),
+            (0.4, ConsumableItem, {'name': 'Banana', 'quantity': 3, 'type': ConsumableType.STEP}),
+        ]
         super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path='rooms/Closet.webp')
     
     def on_enter(self, player: Player):
@@ -227,7 +260,7 @@ class Closet(BlueRoom):
         self.visited = True
     
     def on_draft(self, player):
-        pass
+        self.discover_items(player)
     
     def shop(self, player, choice: str):
         return super().shop(player, choice)

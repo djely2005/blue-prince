@@ -506,7 +506,7 @@ class Map:
         cloned_room._Room__price = room.price
         cloned_room._Room__doors = cloned_doors
         cloned_room._Room__rarity = room.rarity
-        cloned_room._Room__possible_items = room.possible_item
+        cloned_room._Room__possible_items = room.possible_items
         cloned_room._Room__available_items = list(room.available_items) if room.available_items else []
         cloned_room._Room__sprite = room._Room__sprite  # Share sprite (it's read-only)
         cloned_room._Room__visited = False  # Reset visited state

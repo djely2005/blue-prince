@@ -92,14 +92,36 @@ class Inventory:
 
     def use_other_item(self, item) -> str:
         """Use/consume an OtherItem. Returns a message about the effect.
-        OtherItems are assumed to restore steps when consumed.
+        Handles ConsumableItems and OtherItems based on their type.
         """
         if item not in self.otherItems:
             return "Item not found"
         
-        # Get the quantity from the item (steps bonus)
+        # Get the item's type and quantity
         bonus = getattr(item, 'quantity', 5)
-        self.add_steps(bonus)
-        self.otherItems.remove(item)
+        item_type = getattr(item, 'type', None)
         
-        return f"Used {item.name}! Gained {bonus} steps."
+        # Apply the effect based on type
+        if item_type and hasattr(item_type, 'name'):
+            type_name = item_type.name
+            if type_name == 'STEP':
+                self.add_steps(bonus)
+                msg = f"Used {item.name}! Gained {bonus} steps."
+            elif type_name == 'MONEY':
+                self.add_money(bonus)
+                msg = f"Used {item.name}! Gained {bonus} money."
+            elif type_name == 'GEM':
+                self.add_gems(bonus)
+                msg = f"Used {item.name}! Gained {bonus} gems."
+            elif type_name == 'KEY':
+                self.add_keys(bonus)
+                msg = f"Used {item.name}! Gained {bonus} keys."
+            else:
+                msg = f"Used {item.name}!"
+        else:
+            # Default: assume steps
+            self.add_steps(bonus)
+            msg = f"Used {item.name}! Gained {bonus} steps."
+        
+        self.otherItems.remove(item)
+        return msg

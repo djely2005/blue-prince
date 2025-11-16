@@ -56,6 +56,25 @@ class OrangeRoom(Room):
 
     def apply_effect(self, player: Player):
         pass
+    
+    def discover_items(self, player: Player):
+        """
+        Samples items from possible_items based on player luck.
+        Luck increases probability of discovering items (minimum 10%).
+        """
+        for probability, item_class, kwargs in self.possible_items:
+            # Adjust probability by player luck (multiplier between 0.1 and 1.0)
+            final_prob = probability * max(0.1, player.luck)
+            if self._room_random.random() < final_prob:
+                # Create the item and add to inventory
+                item = item_class(**kwargs)
+                if hasattr(item, 'type') and hasattr(item.type, 'name'):
+                    # ConsumableItem: add to otherItems
+                    player.inventory.otherItems.append(item)
+                else:
+                    # PermanentItem or OtherItem: add accordingly
+                    if hasattr(player.inventory, 'otherItems'):
+                        player.inventory.otherItems.append(item)
 
 class Hallway(OrangeRoom):
     def __init__(self):
@@ -78,7 +97,7 @@ class Hallway(OrangeRoom):
         return super().on_enter(player)
     
     def on_draft(self, player):
-        return super().on_draft(player)
+        self.discover_items(player)
     
     def shop(self, player, choice: str):
         return super().shop(player, choice)
@@ -100,7 +119,7 @@ class Passageway(OrangeRoom):
         return super().on_enter(player)
     
     def on_draft(self, player):
-        return super().on_draft(player)
+        self.discover_items(player)
     
     def shop(self, player, choice: str):
         return super().shop(player, choice)
