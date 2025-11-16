@@ -3,6 +3,7 @@ from typing import Tuple
 from src.entities.inventory import Inventory
 from src.utils.direction import Direction
 import pygame
+from src.entities.permanent_item import PermanentItem
 # keep long/explicit names
 _DIRECTION_MAP = {
     # AZERTY
@@ -73,3 +74,7 @@ class Player:
 
     def spend_dice(self, value):
         self.inventory.spend_dice(value)
+
+    def add_permanent_item(self, value: PermanentItem):
+        value.on_enter_inventory(self)
+        self.inventory.add_permanent_item(value)

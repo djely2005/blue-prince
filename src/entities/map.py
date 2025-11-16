@@ -38,11 +38,10 @@ class Map:
         self.random = random.Random(seed)
         self.__pending_door = None  # Stores (position, direction) when door is opened
         self.__room_rotation = {}  # Tracks how many times each room is rotated
-        # Game state flags
+		# Game state flags
         self.game_over = False
         self.game_over_message = ""
-        
-
+        self.game_over_reason = None  # 'win' or 'lose'
     @property
     def seed(self):
         return self.__seed
@@ -298,6 +297,7 @@ class Map:
         self.__room_rotation = {}
         self.game_over = False
         self.game_over_message = ""
+        self.game_over_reason = None
 
     def handle_room_selection(self, selected_room: Room, player: Player) -> bool:
         """
@@ -438,6 +438,7 @@ class Map:
             if getattr(new_room, 'name', '') == 'Antechamber':
                 self.game_over = True
                 self.game_over_message = 'You reached the Antechamber — You win!'
+                self.game_over_reason = 'win'
         except Exception:
             pass
 

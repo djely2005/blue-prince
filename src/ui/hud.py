@@ -20,6 +20,8 @@ class HUD:
 		# Transient message state
 		self._message = None
 		self._message_expire = 0.0
+		# OtherItems state for clicking/consuming
+		self._other_items_rects = []  # List of (rect, item) for click detection
 
 	def draw(self, screen: pygame.Surface, player):
 		"""Draw the HUD panel with player inventory and stats."""
@@ -64,8 +66,23 @@ class HUD:
 			screen.blit(perm_title, (x, y))
 			y += self.line_height
 
-			for item in inventory.permanentItems:
-				item_text = self.font.render(f"- {item.name}", True, (0, 0, 0))
+		for item in inventory.permanentItems:
+			item_text = self.font.render(f"- {item.name}", True, (0, 0, 0))
+			screen.blit(item_text, (x + 10, y))
+			y += self.line_height
+
+		# OtherItems (consumables)
+		if hasattr(inventory, 'otherItems') and inventory.otherItems:
+			y += 10
+			other_title = self.font.render("CONSUMABLES:", True, DARK_BLUE)
+			screen.blit(other_title, (x, y))
+			y += self.line_height
+
+			self._other_items_rects = []
+			for item in inventory.otherItems:
+				item_text = self.font.render(f"- {item.name} (click to use)", True, (100, 200, 100))
+				item_rect = item_text.get_rect(topleft=(x + 10, y))
+				self._other_items_rects.append((item_rect, item))
 				screen.blit(item_text, (x + 10, y))
 				y += self.line_height
 
@@ -83,4 +100,11 @@ class HUD:
 		"""Show a transient message on the HUD for `duration` seconds."""
 		self._message = str(text)
 		self._message_expire = pygame.time.get_ticks() / 1000.0 + float(duration)
+
+	def handle_click(self, pos: tuple) -> 'OtherItem | None':
+		"""Check if click is on a consumable item and return it. Otherwise return None."""
+		for item_rect, item in self._other_items_rects:
+			if item_rect.collidepoint(pos):
+				return item
+		return None
 

@@ -65,7 +65,7 @@ class Commissary(YellowRoom):
             idx = rnd.randrange(len(pool))
             cls, label, base_price = pool.pop(idx)
             price = max(1, int(base_price * (1 + (0.2 * (luck - 1)))))
-            item = cls(label, 1)
+            item = cls()
             shop_item = ShopItem(item, price)
             # Mark as owned if player already has it
             for p in player.inventory.permanentItems:

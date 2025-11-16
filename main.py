@@ -101,7 +101,7 @@ def main():
                             elif itm.type.name == 'DICE':
                                 inv.add_dice(itm.quantity)
                         else:
-                            inv.add_permanent_item(itm)
+                            player.add_permanent_item(itm)
                             si.mark_owned(True)
 
                     return cb
@@ -156,6 +156,14 @@ def main():
                 pygame.quit()
                 sys.exit()
 
+            # Handle HUD click for consuming OtherItems
+            if event.type == pygame.MOUSEBUTTONDOWN and not room_selector.active:
+                clicked_item = hud.handle_click(event.pos)
+                if clicked_item is not None:
+                    msg = session.player.inventory.use_other_item(clicked_item)
+                    hud.show_message(msg, 3.0)
+                    continue
+
             # Handle room selector first if active
             if room_selector.active:
                 result = room_selector.handle_event(event)
@@ -203,14 +211,29 @@ def main():
         if not room_selector.active:
             menu.draw(screen)
 
-        # If the map signalled game over (Antechamber reached), show overlay and exit
+        # Check for losing condition: steps reached zero
+        if session.player.inventory.steps.quantity <= 0 and not getattr(game_map, 'game_over', False):
+            game_map.game_over = True
+            game_map.game_over_message = "You ran out of steps!"
+            game_map.game_over_reason = 'lose'
+
+        # If the map signalled game over, show overlay and exit
         if getattr(game_map, 'game_over', False):
             overlay = pygame.Surface((WIDTH, HEIGHT))
             overlay.set_alpha(200)
             overlay.fill((0, 0, 0))
             screen.blit(overlay, (0, 0))
             big_font = pygame.font.Font(None, 64)
-            title = big_font.render("You Win!", True, (255, 215, 0))
+            
+            # Display different messages for win/loss
+            reason = getattr(game_map, 'game_over_reason', 'win')
+            if reason == 'win':
+                title = big_font.render("You Win!", True, (255, 215, 0))
+                title_color = (255, 215, 0)
+            else:
+                title = big_font.render("Game Over!", True, (255, 0, 0))
+                title_color = (255, 0, 0)
+            
             title_rect = title.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 24))
             screen.blit(title, title_rect)
             msg_text = getattr(game_map, 'game_over_message', '') + f"  (Seed: {seed})"

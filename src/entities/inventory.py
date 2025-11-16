@@ -10,16 +10,16 @@ class Inventory:
         """Explicit names preferred. Counts start as per spec; adjust if design changes."""
         self.permanentItems: list[PermanentItem] = [
         ]
+        self.otherItems: list = []  # Consumable items found in rooms
         self.steps: ConsumableItem = ConsumableItem('Steps', 70, ConsumableType.STEP)
         self.money: ConsumableItem = ConsumableItem('Money', 50, ConsumableType.MONEY)
         self.gems: ConsumableItem = ConsumableItem('Gems', 30, ConsumableType.GEM)
-        self.keys: ConsumableItem = ConsumableItem('keys', 0, ConsumableType.KEY)
+        self.keys: ConsumableItem = ConsumableItem('keys', 100, ConsumableType.KEY)
         self.dice: ConsumableItem = ConsumableItem('Dice', 20, ConsumableType.DICE)
         # Keep constructor minimal; avoid side-effects here.
     # Needs to be private
 
     def add_permanent_item(self, value: PermanentItem):
-        value.on_enter_inventory()
         self.permanentItems.append(value)
     # Let's keep the method for later
     # We use clear verbs and explicit intent.
@@ -89,3 +89,17 @@ class Inventory:
         # Return True if any permanent items exist. Specific queries
         # (has_shovel, etc.) should be added if needed.
         return len(self.permanentItems) > 0
+
+    def use_other_item(self, item) -> str:
+        """Use/consume an OtherItem. Returns a message about the effect.
+        OtherItems are assumed to restore steps when consumed.
+        """
+        if item not in self.otherItems:
+            return "Item not found"
+        
+        # Get the quantity from the item (steps bonus)
+        bonus = getattr(item, 'quantity', 5)
+        self.add_steps(bonus)
+        self.otherItems.remove(item)
+        
+        return f"Used {item.name}! Gained {bonus} steps."
