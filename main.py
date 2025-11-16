@@ -227,7 +227,6 @@ def main():
 
         # Draw the right menu (always draw unless in room selector mode)
         if not room_selector.active:
-            print('test: ', current_room.available_items)
             menu.draw(screen, current_room)
 
         # Check for losing condition: steps reached zero

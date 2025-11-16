@@ -37,7 +37,6 @@ class ChoiceMenu:
             y += 32
 
             self.other_items_rects = []
-            print('test')
             for item in current_room.available_items:
                 item_text = self.font.render(f"- {item.name} (click to use)", True, (100, 200, 100))
                 item_rect = item_text.get_rect(topleft=(x + 10, y))
