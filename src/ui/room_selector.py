@@ -123,7 +123,6 @@ class RoomSelector:
             elif event.key == pygame.K_RETURN:
                 selected_room = self.room_choices[self.selected_index]
                 selected_room.visited = True
-                print(selected_room.visited)
                 self.clear()
                 return selected_room
 

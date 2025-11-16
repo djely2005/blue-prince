@@ -12,27 +12,6 @@ from src.entities.consumable_item import ConsumableItem
 from src.entities.player import Player
 from src.session import session
 
-# !!!!!! THIS need to be verified because I did it before you defined the classes needed
-# My structure : name_room: (probability, type, list[name, quantity])
-possible_items = {
-    "Bedroom": [
-        (0.4, ConsumableItem, {'name': 'Gold', 'quantity': 3}),
-        (0.3, OtherItem, {'name': 'Apple', 'quantity': 1}),
-        (0.2, ConsumableItem, {'name': 'Gem', 'quantity': 1}),
-        (0.15, ConsumableItem, {'name': 'Die', 'quantity': 1}),
-        (0.15, ConsumableItem, {'name': 'Key', 'quantity': 1})
-        # the first number is for probability I just did a random number we can change it later if needed
-    ],
-    "Boudoir": [
-        (0.25, ConsumableItem, {'name': 'Gold', 'quantity': 2}),
-        (0.20, ConsumableItem, {'name': 'Gold', 'quantity': 3}),
-        (0.15, ConsumableItem, {'name': 'Gold', 'quantity': 5}),
-        (0.2, ConsumableItem, {'name': 'Gem', 'quantity': 1}),
-        (0.15, ConsumableItem, {'name': 'Key', 'quantity': 1})
-    ]
-
-}
-
 class VioletRoom(Room):
     def __init__(self, name: str, price: int, doors: list[Door], rarity: Rarity, number_of_steps: int = 1, img_path: str = '', possible_items = []):
         super().__init__(name, price, doors, rarity, session, possible_items=possible_items, img_path = img_path)

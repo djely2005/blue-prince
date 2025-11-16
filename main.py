@@ -107,7 +107,6 @@ def main():
                             success, msg = res[0], res[1]
                         else:
                             success, msg = False, 'Nothing happened'
-
                         hud.show_message(msg, 3.0)
 
                     return cb

@@ -2,7 +2,7 @@ from src.entities.event import Event
 from src.session import session
 from src.entities.permanent_item import PermanentItem
 from src.entities.lock_pick import LockPick
-from src.entities.hammer import Hammer
+from src.entities.shovel import Shovel
 from src.entities.consumable_item import ConsumableItem
 from src.utils.consumable_type import ConsumableType
 import random
@@ -54,9 +54,9 @@ class Locker(Event):
         # Small chance for a permanent (lower than chest)
         if rnd.random() < min(0.3, 0.05 * luck):
             # give a LockPick occasionally
-            item = LockPick('Lock Pick', 1)
+            item = Shovel('shovel', 1)
             names = [getattr(p, 'name', '').lower() for p in player.inventory.permanentItems]
-            if 'lock pick' not in names and 'lockpick' not in names:
+            if 'shovel' not in names:
                 player.inventory.add_permanent_item(item)
                 reward['permanent'] = item
 

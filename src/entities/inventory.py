@@ -2,12 +2,14 @@ from dataclasses import dataclass
 from src.entities.permanent_item import PermanentItem
 from src.entities.consumable_item import ConsumableItem
 from src.utils.consumable_type import ConsumableType
+from src.entities.lock_pick import LockPick
 # Should we reconsider the implementation of inventory ?
 # I think we need a better structure
 class Inventory:
     def __init__(self):
         """Explicit names preferred. Counts start as per spec; adjust if design changes."""
-        self.permanentItems: list[PermanentItem] = []
+        self.permanentItems: list[PermanentItem] = [
+        ]
         self.steps: ConsumableItem = ConsumableItem('Steps', 70, ConsumableType.STEP)
         self.money: ConsumableItem = ConsumableItem('Money', 50, ConsumableType.MONEY)
         self.gems: ConsumableItem = ConsumableItem('Gems', 30, ConsumableType.GEM)

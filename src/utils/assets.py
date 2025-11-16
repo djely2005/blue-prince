@@ -15,10 +15,8 @@ def load_image(relative_path: str) -> pygame.Surface:
     # Already loaded? Return it
     if relative_path in _surface_cache:
         return _surface_cache[relative_path]
-    print(relative_path)
     # Not loaded yet → load it from disk
     full_path = asset_path(relative_path)
-    print(full_path)
     image = pygame.image.load(full_path)
 
     # Store in cache

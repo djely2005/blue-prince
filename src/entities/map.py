@@ -623,4 +623,4 @@ class Map:
         return True
 
 
-game_map = Map(0)
+game_map = Map(50)
