@@ -5,3 +5,6 @@ from src.utils.rarity import Rarity
 class PermanentItem(Object):
     def __init__(self, name: str, quantity: int, rarity: Rarity.COMMON):
         super().__init__(name, quantity, rarity=rarity)
+    
+    def on_enter_inventory(self, player):
+        pass
