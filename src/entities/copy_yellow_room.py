@@ -16,7 +16,6 @@ class YellowRoom(Room):
     def __init__(self, name: str, price: int, doors: list[Door], rarity: Rarity, possible_items = [], img_path: str = ''):
         # Possible Item to buy or exchange
         super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path= img_path)
-        self.shop_items: list[ShopItem] = []
 
     @abstractmethod
     def on_enter(self, player):
@@ -26,12 +25,11 @@ class YellowRoom(Room):
     def on_draft(self, player):
         return super().on_draft(player)
     
-    def shop(self, player: Player, choice: str) -> bool:
-        """Shop logic using shopitem"""
-        for item in self.shop_items:
-            if item.label == choice:
-                return item.buy(player)
-        return False
+    # Not sure if I leave it because I am not about shop_items ?
+
+    @abstractmethod
+    def shop(self, player, choice: str):
+        return super().shop(player, choice)
     
     def apply_effect(self, player):
         pass
@@ -55,26 +53,49 @@ class LaundryRoom(YellowRoom):
         super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path= sprite_path)
     
     def on_draft(self, player):
-        pass
+        return super().on_draft(player)
     
     def on_enter(self, player):
-        self.shop_items = [
+        self.possible_item = [
             ShopItem(
-                label="Spin Cycle",
-                price=5,
-                effect=lambda p: p.inventory.swap_resources("Spin Cycle")
+                ConsumableItem("Gems", self.__get_player_money() - 5, ConsumableType.GEM),
+                self.__get_player_money()
             ),
             ShopItem(
-                label="Wash & Dry",
-                price=5,
-                effect=lambda p: p.inventory.swap_resources("Wash & Dry")
+                ConsumableItem("Keys", self.__get_player_money() - 5, ConsumableType.KEY),
+                self.__get_player_money()
             ),
             ShopItem(
-                label="Fluff & Fold",
-                price=10,
-                effect=lambda p: p.inventory.swap_resources("Fluff & Fold")
-            ),
+                ConsumableItem("Keys", self.__get_player_money() - 5, ConsumableType.KEY),
+                self.__get_player_gems()
+            )
+
         ]
+        return super().on_enter(player)
+    
+    def __get_player_gems(self, player: Player):
+        return player.inventory.gems.quantity
+    
+    def __get_player_money(self, player: Player):
+        return player.inventory.money.quantity
+    
+    def shop(self, player: Inventory, choice: str) -> bool: 
+        if choice == "Spin Cycle":
+            if player.try_spend_gold(5):
+                player.inventory.swap_resources(choice)
+                return True
+        
+        elif choice == "Wash & Dry":
+            if player.try_spend_gold(5):
+                player.inventory.swap_resources(choice)
+                return True
+        
+        elif choice == "Fluff & Fold":
+            if player.try_spend_gold(10):
+                player.inventory.swap_resources(choice)
+                return True
+        
+        return False
     
 class Locksmith(YellowRoom):
     def __init__(self):
@@ -97,25 +118,38 @@ class Locksmith(YellowRoom):
         pass
     
     def on_enter(self, player):
-        self.shop_items = [
+        self.possible_item = [
             ShopItem(
-                label="Key",
-                price=5,
-                effect=lambda p: p.inventory.add_keys(1)
+                ConsumableItem("Keys", self.__get_player_money() - 5, ConsumableType.KEY),
+                self.__get_player_money()
             ),
             ShopItem(
-                label="Set of Keys",
-                price=12,
-                effect=lambda p: p.inventory.add_keys(3)
+                ConsumableItem("Keys", self.__get_player_money() - 12, ConsumableType.KEY),
+                self.__get_player_money()
             ),
             ShopItem(
-                label="Lockpick",
-                price=10,
-                effect=self._give_lockpick
+                PermanentItem("Keys", self.__get_player_money() - 10, PermanentType.LOCKPICK),
+                self.__get_player_gems()
             ),
+
         ]
-    
-    def _give_lockpick(self, player: Player):
-        """Effect only possible if player buys lockpick """
-        if not player.has_lock_pick: # Flase meaning he doesn't have one
-            player.has_lock_pick = True
+        return super().on_enter(player)
+
+    def shop(self, player: Inventory, choice: str) -> bool:
+        
+        if choice == "Key":
+            if player.try_spend_gold(5):
+                player.add_keys(1)
+                return True
+        
+        elif choice == "Set of Keys":
+            if player.try_spend_gold(12):
+                player.add_keys(3)
+                return True
+        
+        elif choice == "Lockpick":
+            if player.try_spend_gold(10) and player.has_lock_pick: # True and False
+                player.has_lock_pick = True
+                return True 
+        
+        return False

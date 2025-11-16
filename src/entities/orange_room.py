@@ -63,10 +63,6 @@ class OrangeRoom(Room):
     @abstractmethod
     def on_draft(self, player):
         return super().on_draft(player)
-    
-    @abstractmethod
-    def shop(self, player, choice: str):
-        return super().shop(player)
 
     def apply_effect(self, player: Player):
         pass
@@ -93,9 +89,6 @@ class Hallway(OrangeRoom):
     
     def on_draft(self, player):
         return super().on_draft(player)
-    
-    def shop(self, player, choice: str):
-        return super().shop(player, choice)
 
 class Passageway(OrangeRoom):
     def __init__(self):
@@ -115,6 +108,3 @@ class Passageway(OrangeRoom):
     
     def on_draft(self, player):
         return super().on_draft(player)
-    
-    def shop(self, player, choice: str):
-        return super().shop(player, choice)

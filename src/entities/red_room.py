@@ -30,10 +30,6 @@ class RedRoom(Room):
     def on_draft(self, player):
         return super().on_draft(player)
     
-    @abstractmethod
-    def shop(self, player, choice: str):
-        return super().shop(player)
-    
     def apply_effect(self, player: Player):
         pass
 
@@ -53,9 +49,7 @@ class Lavatory(RedRoom):
     
     def on_draft(self, player):
         return super().on_draft(player)
-    
-    def shop(self, player, choice: str):
-        return super().shop(player, choice)
+
 
 class Gymnasium(RedRoom):
     def __init__(self):
@@ -76,5 +70,3 @@ class Gymnasium(RedRoom):
     def on_draft(self, player):
         return super().on_draft(player)
     
-    def shop(self, player, choice: str):
-        return super().shop(player, choice)

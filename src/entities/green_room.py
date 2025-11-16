@@ -40,10 +40,6 @@ class GreenRoom(Room):
     @abstractmethod
     def on_draft(self, player):
         return super().on_draft(player)
-    
-    @abstractmethod
-    def shop(self, player, choice: str):
-        return super().shop(player)
 
     def apply_effect(self, player: Player):
         pass
@@ -70,9 +66,7 @@ class Terrace(GreenRoom):
     
     def on_draft(self, player):
         pass
-    
-    def shop(self, player, choice: str):
-        return super().shop(player, choice)
+
 
 class Veranda(GreenRoom):
     def __init__(self):
@@ -92,6 +86,3 @@ class Veranda(GreenRoom):
     
     def on_draft(self, player):
         pass
-
-    def shop(self, player, choice: str):
-        return super().shop(player, choice)
