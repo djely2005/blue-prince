@@ -67,10 +67,10 @@ class Room(ABC):
     @property
     def possible_item(self):
         return self.__possible_items
-    
     @possible_item.setter
     def possible_item(self, value):
         self.__possible_items = value
+    
     @abstractmethod
     def on_enter(self, player):
         """Applies the room's special effect when the player enters."""
@@ -79,6 +79,11 @@ class Room(ABC):
     @abstractmethod
     def on_draft(self, player):
         """Applies the room's special effect when the player drafts."""
+        pass
+
+    @abstractmethod
+    def shop(self, player, choice: str):
+        """To create the logic of the yellow rooms"""
         pass
 
     def __repr__(self):

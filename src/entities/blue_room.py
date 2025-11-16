@@ -22,6 +22,10 @@ class BlueRoom(Room):
     @abstractmethod
     def on_draft(self, player):
         return super().on_draft(player)
+    
+    @abstractmethod
+    def shop(self, player, choice: str):
+        return super().shop(player)
 
 
 class EntranceHall(BlueRoom):
@@ -43,6 +47,9 @@ class EntranceHall(BlueRoom):
     
     def on_draft(self, player):
         pass
+    
+    def shop(self, player, choice: str):
+        return super().shop(player, choice)
 
 
 class Parlor(BlueRoom):
@@ -63,6 +70,9 @@ class Parlor(BlueRoom):
     
     def on_draft(self, player):
         pass
+    
+    def shop(self, player, choice: str):
+        return super().shop(player, choice)
 
 
 class Nook(BlueRoom):
@@ -112,6 +122,9 @@ class Den(BlueRoom):
     
     def on_draft(self, player):
         return super().on_draft(player)
+    
+    def shop(self, player, choice: str):
+        return super().shop(player, choice)
 
 
 class Pantry(BlueRoom):
@@ -155,6 +168,9 @@ class Pantry(BlueRoom):
     
     def on_draft(self, player):
         return super().on_draft(player)
+    
+    def shop(self, player, choice: str):
+        return super().shop(player, choice)
 
 
 class Antechamber(BlueRoom):  
@@ -176,6 +192,9 @@ class Antechamber(BlueRoom):
     
     def on_draft(self, player):
         pass
+    
+    def shop(self, player, choice: str):
+        return super().shop(player, choice)
 
 
 class Closet(BlueRoom):  
@@ -206,3 +225,6 @@ class Closet(BlueRoom):
     
     def on_draft(self, player):
         pass
+    
+    def shop(self, player, choice: str):
+        return super().shop(player, choice)

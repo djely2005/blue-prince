@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from src.entities.room import Room
 from src.entities.door import Door
 from src.entities.inventory import Inventory

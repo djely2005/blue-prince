@@ -81,8 +81,6 @@ class Inventory:
         elif choice == "FliffFold":
             self.money.quantity, self.keys.quantity = self.keys.quantity, self.money.quantity
 
-
-
     def has_any_permanent_tools(self) -> bool:
         # Return True if any permanent items exist. Specific queries
         # (has_shovel, etc.) should be added if needed.

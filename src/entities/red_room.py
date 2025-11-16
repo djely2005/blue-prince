@@ -1,8 +1,11 @@
 from src.entities.room import Room
 from src.entities.door import Door
-from src.entities.inventory import Inventory
+from abc import abstractmethod
+from src.entities.player import Player
 from src.utils.rarity import Rarity
 from src.entities.consumable_item import ConsumableItem
+from src.utils.lock_state import LockState
+from src.utils.direction import Direction
 
 # !!!!!! THIS need to be verified because I did it before you defined the classes needed
 # My structure : name_room: (probability, type, list[name, quantity])
@@ -16,11 +19,62 @@ possible_items = {
 }
 
 class RedRoom(Room):
-    def __init__(self, name: str, price: int, doors: list[Door], rarity: Rarity, img_path: str):
-        super().__init__(name, price, doors, rarity, img_path= img_path, possible_items= possible_items)
+    def __init__(self, name: str, price: int, doors: list[Door], rarity: Rarity, possible_items = [], img_path: str = ''):
+        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path= img_path)
             
-    def apply_effect(self, player: Inventory):
-        if self.name == "Lavatory" :
-            pass 
-        elif self.name == "Gymnasium":
-            player.lose_steps(2)
+    @abstractmethod
+    def on_enter(self, player):
+        return super().on_enter(player)
+    
+    @abstractmethod
+    def on_draft(self, player):
+        return super().on_draft(player)
+    
+    @abstractmethod
+    def shop(self, player, choice: str):
+        return super().shop(player)
+    
+    def apply_effect(self, player: Player):
+        pass
+
+
+class Lavatory(RedRoom):
+    def __init__(self):
+        name="Lavatory" 
+        price=0
+        doors=[Door(LockState.UNLOCKED, Direction.BOTTOM)]
+        rarity=Rarity.COMMON
+        sprite_path="rooms/lavatory.png"
+        possible_items = []
+        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path= sprite_path)
+
+    def on_enter(self, player):
+        return super().on_enter(player)
+    
+    def on_draft(self, player):
+        return super().on_draft(player)
+    
+    def shop(self, player, choice: str):
+        return super().shop(player, choice)
+
+class Gymnasium(RedRoom):
+    def __init__(self):
+        name="Gymnasium"
+        price=0
+        doors=[Door(LockState.UNLOCKED, Direction.BOTTOM), Door(LockState.UNLOCKED, Direction.RIGHT), Door(LockState.UNLOCKED, Direction.LEFT)]
+        rarity=Rarity.STANDARD
+        sprite_path="rooms/gymasio.png"
+        possible_items = [
+                            (0.10, ConsumableItem, {'name': 'Gold', 'quantity': 3}),
+                            (0.05, ConsumableItem, {'name': 'Key', 'quantity': 1})
+        ]
+        super().__init__(name, price, doors, rarity, possible_items= possible_items, img_path= sprite_path)
+
+    def on_enter(self, player):
+        player.lose_steps(2)
+    
+    def on_draft(self, player):
+        return super().on_draft(player)
+    
+    def shop(self, player, choice: str):
+        return super().shop(player, choice)
