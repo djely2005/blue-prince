@@ -138,7 +138,7 @@ class Room(ABC):
             rotation_steps = getattr(self, '_Room__rotation', 0)
             if rotation_steps:
                 # pygame.transform.rotate uses degrees counter-clockwise, so negative for clockwise
-                angle = -90 * (rotation_steps + 1)
+                angle =  90 * (rotation_steps)
                 rotated = pygame.transform.rotate(scale_sprite, angle)
                 # keep rotated image centered in the tile
                 rotated_rect = rotated.get_rect(center=(x + size // 2, y + size // 2))

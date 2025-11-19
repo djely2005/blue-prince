@@ -91,7 +91,7 @@ class LaundryRoom(YellowRoom):
     - Service C: Exchange ALL Keys with ALL Gold at 1:1 for cost 10 money
     """
     def __init__(self, name: str = 'Laundry Room', price: int = 0, doors: list[Door] = None, rarity: Rarity = Rarity.RARE, img_path: str = 'rooms/Laundry_Room.png'):
-        doors = doors or [Door(LockState.DOUBLE_LOCKED, Direction.BOTTOM), Door(LockState.DOUBLE_LOCKED, Direction.LEFT)]
+        doors = doors or [Door(LockState.DOUBLE_LOCKED, Direction.BOTTOM)]
         super().__init__(name, price, doors, rarity, possible_items=[], img_path=img_path)
 
     def on_draft(self, player: Player):

@@ -67,7 +67,6 @@ def main():
     while True:
         # Prepare menu choices each frame (shops take priority)
         menu.choices = []
-        shop_active = False
         current_room = game_map.grid[session.player.grid_position[0]][session.player.grid_position[1]]
         if isinstance(current_room, YellowRoom) and getattr(current_room, 'possible_items', None):
             shop_items = current_room.possible_items
@@ -79,11 +78,12 @@ def main():
                     owned = ' (Owned)' if getattr(shop_item, 'owned', False) else ''
                     label = f"Buy {getattr(shop_item.item, 'name', str(shop_item.item))} - Cost: {shop_item.price}{owned}"
 
-                def make_buy_callback(si, room):
+                def make_buy_callback(si, room, owned):
                     def cb(player):
                         inv = player.inventory
                         if si.price > inv.money.quantity:
                             return
+                        if owned: return
                         inv.spend_money(si.price)
                         if isinstance(room, LaundryRoom) and isinstance(si.item, dict):
                             room.perform_service(player, si.item.get('service'))
@@ -106,7 +106,7 @@ def main():
 
                     return cb
 
-                menu.choices.append((label, make_buy_callback(shop_item, current_room)))
+                menu.choices.append((label, make_buy_callback(shop_item, current_room, getattr(shop_item, 'owned', False))))
             shop_active = True
 
         # Door opening and room navigation available regardless of shop status
@@ -178,7 +178,10 @@ def main():
                 clicked_item = menu.handle_click(event.pos)
                 if clicked_item is not None:
                     msg = session.player.inventory.use_other_item(clicked_item)
-                    current_room.available_items.remove(clicked_item)
+                    try:
+                        current_room.available_items.remove(clicked_item)
+                    except:
+                        pass
                     hud.show_message(msg, 3.0)
                     continue
 
@@ -192,6 +195,8 @@ def main():
                         session.player.inventory.spend_dice(room_selector.reroll_cost)
                         # Double the cost for next reroll
                         room_selector.reroll_cost *= 2
+                        room_choices = game_map.request_place_room(session.player.grid_position, session.player.selected, session.player)
+                        room_selector.set_choices(room_choices)
                         # Re-request room placement with new weighted choices
                         # We need to store the current door position/direction from the last open_door_callback
                         # For now, we'll use the player's selected direction and position
