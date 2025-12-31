@@ -32,7 +32,7 @@ class Map:
         self.__grid: list[Room] = [[None for _ in range(GRID_WIDTH)] for _ in range(GRID_HEIGHT)]
         # center using integer division (0-based indices)
         start_r = GRID_HEIGHT - 1
-        center_c = GRID_WIDTH // 2 + 1
+        center_c = GRID_WIDTH // 2
         self.__grid[start_r][center_c] = entrance_hall
         self.__grid[0][center_c] = ante_chambre
         self.random = random.Random(seed)
@@ -489,11 +489,14 @@ class Map:
         rotations = 0
         for _ in range(4):
             if room.door_direction_exists(target_direction):
+                print(rotations)
                 return rotations
             # Rotate 90° clockwise
             rotations += 1
             for door in room.doors:
+                print('before: ', door.direction)
                 door.direction = Direction.rotate(door.direction)
+                print(door.direction)
 
         # If no door found in any rotation, return 0
         return 0
@@ -665,6 +668,13 @@ class Map:
         # Must be a visited room
         if not isinstance(target_room, Room):
             return False
+        
+        no_direction = True
+        for door in target_room.doors:
+            if door.direction == self._get_opposite_direction(target_direction):
+                no_direction = False
+                break 
+        if no_direction: return False
 
         # Move the player
         player.grid_position = (new_r, new_c)

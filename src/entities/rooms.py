@@ -12,7 +12,7 @@ ante_chambre = Antechamber()
 
 parlor = Parlor()
 
-closet = Closet()
+# closet = Closet()
 
 nook = Nook()
 
@@ -34,7 +34,7 @@ hallway = Hallway()
 
 terance = Terrace()
 
-veranda = Veranda()
+# veranda = Veranda()
 
 gymnasium = Gymnasium()
 
@@ -43,7 +43,7 @@ chapel = Chapel()
 passageway = Passageway()
 FULL_ROOM_DECK = [
     parlor,
-    closet,
+    # closet,
     nook,
     den,
     pantry,
@@ -55,7 +55,7 @@ FULL_ROOM_DECK = [
     hallway,
     passageway,
     terance,
-    veranda,
+    # veranda,
     gymnasium,
     chapel,
 ]
